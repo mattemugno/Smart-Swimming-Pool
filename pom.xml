@@ -22,8 +22,7 @@
         </repository>
         <repository>
             <id>Eclipse Paho Repo</id>
-            <url>https://repo.eclipse.org/content/repositories/paho-
-                releases/</url>
+            <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
         </repository>
     </repositories>
 

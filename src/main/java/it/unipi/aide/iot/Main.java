@@ -8,7 +8,5 @@ public class Main {
         CoapServer coapServer = new CoapServer();
         coapServer.start();
         MQTTSubscriber mqttHandler = new MQTTSubscriber();
-
-
     }
 }

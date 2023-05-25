@@ -7,24 +7,22 @@ import it.unipi.aide.iot.bean.sensors.TemperatureSensor;
 import it.unipi.aide.iot.bean.sensors.WaterLevelSensor;
 import org.eclipse.paho.client.mqttv3.*;
 
+
 public class MQTTSubscriber implements MqttCallback {
+    public String BROKER = "tcp://127.0.0.1:1883";
+    public String CLIENT_ID = "RemoteControlApp";
 
     private MqttClient mqttClient = null;
-    private final String BROKER = "tcp://127.0.0.1:1883";
-    private final String CLIENT_ID = "RemoteControlApp";
-    private final int SECONDS_TO_WAIT_FOR_RECONNECTION = 5;
-    private final int MAX_RECONNECTION_ATTEMPTS = 10;
-    private Gson parser;
-    private PresenceSensor presenceSensor;
-    private ChlorineSensor chlorineSensor;
-    private WaterLevelSensor waterLevelSensor;
-    private TemperatureSensor temperatureSensor;
+    private final PresenceSensor presenceSensor;
+    private final ChlorineSensor chlorineSensor;
+    private final WaterLevelSensor waterLevelSensor;
+    private final TemperatureSensor temperatureSensor;
 
     //private Logger logger;
 
     public MQTTSubscriber()
     {
-        parser = new Gson();
+        Gson parser = new Gson();
         temperatureSensor = new TemperatureSensor();
         presenceSensor = new PresenceSensor();
         chlorineSensor = new ChlorineSensor();
@@ -50,6 +48,7 @@ public class MQTTSubscriber implements MqttCallback {
         int attempts = 0;
         do {
             attempts++; // first iteration iter=1
+            int MAX_RECONNECTION_ATTEMPTS = 10;
             if (attempts > MAX_RECONNECTION_ATTEMPTS)
             {
                 System.err.println("Reconnection with the broker not possible!");
@@ -57,6 +56,7 @@ public class MQTTSubscriber implements MqttCallback {
             }
             try
             {
+                int SECONDS_TO_WAIT_FOR_RECONNECTION = 5;
                 Thread.sleep((long) SECONDS_TO_WAIT_FOR_RECONNECTION * 1000 * attempts);
                 System.out.println("New attempt to connect to the broker...");
                 brokerConnection();

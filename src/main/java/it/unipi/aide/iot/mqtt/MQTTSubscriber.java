@@ -1,10 +1,10 @@
 package it.unipi.aide.iot.mqtt;
 
 import com.google.gson.Gson;
-import it.unipi.aide.iot.mqtt.sensors.ChlorineSensor;
-import it.unipi.aide.iot.mqtt.sensors.PresenceSensor;
-import it.unipi.aide.iot.mqtt.sensors.TemperatureSensor;
-import it.unipi.aide.iot.mqtt.sensors.WaterLevelSensor;
+import it.unipi.aide.iot.bean.sensors.ChlorineSensor;
+import it.unipi.aide.iot.bean.sensors.PresenceSensor;
+import it.unipi.aide.iot.bean.sensors.TemperatureSensor;
+import it.unipi.aide.iot.bean.sensors.WaterLevelSensor;
 import org.eclipse.paho.client.mqttv3.*;
 
 public class MQTTSubscriber implements MqttCallback {

@@ -9,5 +9,4 @@ public class CoapRegistrationServer extends CoapServer {
         this.add(new CoapRegistrationResource("registration"));
     }
 
-
 }

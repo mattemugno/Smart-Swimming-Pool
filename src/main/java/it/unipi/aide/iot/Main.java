@@ -13,8 +13,9 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         CoapRegistrationServer coapRegistrationServer = new CoapRegistrationServer();
         coapRegistrationServer.start();
-        MQTTSubscriber mqttHandler = new MQTTSubscriber();
-        MySqlDbHandler mySqlDbHandler = new MySqlDbHandler();
+        MQTTSubscriber mqttSubscriber = new MQTTSubscriber();
+        MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
         Connection connection = mySqlDbHandler.getConnection();
+        System.out.println(connection);
     }
 }

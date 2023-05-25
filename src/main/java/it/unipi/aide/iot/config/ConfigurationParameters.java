@@ -2,7 +2,6 @@ package it.unipi.aide.iot.config;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
-import jdk.internal.org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 
 import javax.xml.XMLConstants;

@@ -1,6 +1,10 @@
 package it.unipi.aide.iot.mqtt;
 
 import com.google.gson.Gson;
+import it.unipi.aide.iot.bean.samples.ChlorineSample;
+import it.unipi.aide.iot.bean.samples.PresenceSample;
+import it.unipi.aide.iot.bean.samples.TemperatureSample;
+import it.unipi.aide.iot.bean.samples.WaterLevelSample;
 import it.unipi.aide.iot.bean.sensors.ChlorineSensor;
 import it.unipi.aide.iot.bean.sensors.PresenceSensor;
 import it.unipi.aide.iot.bean.sensors.TemperatureSensor;
@@ -17,12 +21,12 @@ public class MQTTSubscriber implements MqttCallback {
     private final ChlorineSensor chlorineSensor;
     private final WaterLevelSensor waterLevelSensor;
     private final TemperatureSensor temperatureSensor;
+    Gson parser = new Gson();
 
     //private Logger logger;
 
     public MQTTSubscriber()
     {
-        Gson parser = new Gson();
         temperatureSensor = new TemperatureSensor();
         presenceSensor = new PresenceSensor();
         chlorineSensor = new ChlorineSensor();
@@ -74,19 +78,23 @@ public class MQTTSubscriber implements MqttCallback {
     public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
         String payload = new String(mqttMessage.getPayload());
         if (topic.equals(temperatureSensor.TEMPERATURE_TOPIC)){
-            temperatureSensor.saveTemperatureSample();
+            TemperatureSample temperatureSample = parser.fromJson(payload, TemperatureSample.class);
+            temperatureSensor.saveTemperatureSample(temperatureSample);
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){
-            waterLevelSensor.saveWaterLevelSample();
+            WaterLevelSample waterLevelSample = parser.fromJson(payload, WaterLevelSample.class);
+            waterLevelSensor.saveWaterLevelSample(waterLevelSample);
         }
         else if(topic.equals(chlorineSensor.CHLORINE_TOPIC)){
-            chlorineSensor.saveChlorineSample();
+            ChlorineSample chlorineSample = parser.fromJson(payload, ChlorineSample.class);
+            chlorineSensor.saveChlorineSample(chlorineSample);
         }
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
-            presenceSensor.savePresenceSample();
+            PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
+            presenceSensor.savePresenceSample(presenceSample);
         }
         else{
-            System.out.println("You are not subscripted to the '" + topic + "' topic");
+            System.out.println("You are not subscribed to the '" + topic + "' topic");
         }
     }
 

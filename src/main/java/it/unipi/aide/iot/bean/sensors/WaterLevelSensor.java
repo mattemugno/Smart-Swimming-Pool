@@ -1,5 +1,10 @@
 package it.unipi.aide.iot.bean.sensors;
 
+import it.unipi.aide.iot.bean.samples.WaterLevelSample;
+import it.unipi.aide.iot.persistence.MySqlDbHandler;
+
+import java.sql.Timestamp;
+
 public class WaterLevelSensor {
     public final String WATER_LEVEL_TOPIC = "water_level";
 
@@ -8,8 +13,10 @@ public class WaterLevelSensor {
         return 0;
     }
 
-    public void saveWaterLevelSample(){
+    public void saveWaterLevelSample(WaterLevelSample waterLevelSample){
         //method to store in db the last sample read from broker
+        waterLevelSample.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        MySqlDbHandler.getInstance().insertWaterLevelSample(waterLevelSample);
     }
 
 }

@@ -1,8 +1,9 @@
 package it.unipi.aide.iot;
 
-import it.unipi.aide.iot.bean.actuators.HeatingSystem;
-import it.unipi.aide.iot.bean.sensors.PresenceSensor;
-import it.unipi.aide.iot.bean.sensors.TemperatureSensor;
+import it.unipi.aide.iot.bean.coap_actuators.HeatingSystem;
+import it.unipi.aide.iot.bean.coap_actuators.Light;
+import it.unipi.aide.iot.bean.mqtt_sensors.PresenceSensor;
+import it.unipi.aide.iot.bean.mqtt_sensors.TemperatureSensor;
 import it.unipi.aide.iot.coap.CoapRegistrationServer;
 import it.unipi.aide.iot.mqtt.MQTTSubscriber;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
@@ -11,8 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 
-public class Main {
+public class PoolControlSystem {
     public static void main(String[] args) throws SQLException {
         CoapRegistrationServer coapRegistrationServer = new CoapRegistrationServer();
         coapRegistrationServer.start();
@@ -46,6 +48,9 @@ public class Main {
                         break;
                     case "!get_presence":
                         getPresence();
+                        break;
+                    case "!set_color":
+                        setLightColor(arguments);
                         break;
                     case "!exit":
                         System.out.println("Bye!");
@@ -100,6 +105,17 @@ public class Main {
             System.out.println("There is someone in the swimming pool");
         else
             System.out.println("Swimming pool is empty");
+    }
+
+    private static void setLightColor(String[] arguments) {
+        if (arguments.length != 2){
+            System.out.println("Missing argument/s in the request");
+            return;
+        }
+        if(!Objects.equals(arguments[1], "RED") & !Objects.equals(arguments[1], "GREEN") & !Objects.equals(arguments[1], "YELLOW"))
+            System.out.println("Color not available");
+        else
+            Light.setLightColor(arguments[1]);
     }
 
 

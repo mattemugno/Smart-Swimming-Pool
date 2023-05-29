@@ -1,4 +1,4 @@
-package it.unipi.aide.iot.bean.actuators;
+package it.unipi.aide.iot.bean.coap_actuators;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
@@ -58,7 +58,7 @@ public class Light {
         }
     }
 
-    public void setLightColor(String color) {
+    public static void setLightColor(String color) {
         if(clientLightColorList.size() == 0)
             return;
 

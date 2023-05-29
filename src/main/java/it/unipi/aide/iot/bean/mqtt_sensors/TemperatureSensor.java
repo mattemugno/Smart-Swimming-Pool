@@ -1,4 +1,4 @@
-package it.unipi.aide.iot.bean.sensors;
+package it.unipi.aide.iot.bean.mqtt_sensors;
 
 import it.unipi.aide.iot.bean.samples.TemperatureSample;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;

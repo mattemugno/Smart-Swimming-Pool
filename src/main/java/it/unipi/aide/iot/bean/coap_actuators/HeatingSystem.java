@@ -1,4 +1,4 @@
-package it.unipi.aide.iot.bean.actuators;
+package it.unipi.aide.iot.bean.coap_actuators;
 
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;

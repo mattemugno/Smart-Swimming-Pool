@@ -1,16 +1,16 @@
 package it.unipi.aide.iot.mqtt;
 
 import com.google.gson.Gson;
-import it.unipi.aide.iot.bean.actuators.HeatingSystem;
-import it.unipi.aide.iot.bean.actuators.Light;
+import it.unipi.aide.iot.bean.coap_actuators.HeatingSystem;
+import it.unipi.aide.iot.bean.coap_actuators.Light;
 import it.unipi.aide.iot.bean.samples.ChlorineSample;
 import it.unipi.aide.iot.bean.samples.PresenceSample;
 import it.unipi.aide.iot.bean.samples.TemperatureSample;
 import it.unipi.aide.iot.bean.samples.WaterLevelSample;
-import it.unipi.aide.iot.bean.sensors.ChlorineSensor;
-import it.unipi.aide.iot.bean.sensors.PresenceSensor;
-import it.unipi.aide.iot.bean.sensors.TemperatureSensor;
-import it.unipi.aide.iot.bean.sensors.WaterLevelSensor;
+import it.unipi.aide.iot.bean.mqtt_sensors.ChlorineSensor;
+import it.unipi.aide.iot.bean.mqtt_sensors.PresenceSensor;
+import it.unipi.aide.iot.bean.mqtt_sensors.TemperatureSensor;
+import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
 import org.eclipse.paho.client.mqttv3.*;
 
 
@@ -24,8 +24,6 @@ public class MQTTSubscriber implements MqttCallback {
     private final WaterLevelSensor waterLevelSensor;
     private final TemperatureSensor temperatureSensor;
     Gson parser = new Gson();
-
-    //private Logger logger;
 
     public MQTTSubscriber()
     {
@@ -45,35 +43,6 @@ public class MQTTSubscriber implements MqttCallback {
                 System.out.println("Connection error! Retrying ...");
             }
         }while(!mqttClient.isConnected());
-    }
-
-    @Override
-    public void connectionLost(Throwable throwable) {
-        System.out.println("Connection with the Broker lost!");
-
-        int attempts = 0;
-        do {
-            attempts++; // first iteration iter=1
-            int MAX_RECONNECTION_ATTEMPTS = 10;
-            if (attempts > MAX_RECONNECTION_ATTEMPTS)
-            {
-                System.err.println("Reconnection with the broker not possible!");
-                System.exit(-1);
-            }
-            try
-            {
-                int SECONDS_TO_WAIT_FOR_RECONNECTION = 5;
-                Thread.sleep((long) SECONDS_TO_WAIT_FOR_RECONNECTION * 1000 * attempts);
-                System.out.println("New attempt to connect to the broker...");
-                brokerConnection();
-            }
-            catch (MqttException | InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        } while (!this.mqttClient.isConnected());
-        System.out.println("Connection with the Broker restored!");
-
     }
 
     @Override
@@ -122,9 +91,35 @@ public class MQTTSubscriber implements MqttCallback {
         System.out.println("Message correctly delivered");
     }
 
-    /**
-     * This function is used to try to connect to the broker
-     */
+    @Override
+    public void connectionLost(Throwable throwable) {
+        System.out.println("Connection with the Broker lost!");
+
+        int attempts = 0;
+        do {
+            attempts++; // first iteration iter=1
+            int MAX_RECONNECTION_ATTEMPTS = 10;
+            if (attempts > MAX_RECONNECTION_ATTEMPTS)
+            {
+                System.err.println("Reconnection with the broker not possible!");
+                System.exit(-1);
+            }
+            try
+            {
+                int SECONDS_TO_WAIT_FOR_RECONNECTION = 5;
+                Thread.sleep((long) SECONDS_TO_WAIT_FOR_RECONNECTION * 1000 * attempts);
+                System.out.println("New attempt to connect to the broker...");
+                brokerConnection();
+            }
+            catch (MqttException | InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        } while (!this.mqttClient.isConnected());
+        System.out.println("Connection with the Broker restored!");
+
+    }
+
     private void brokerConnection () throws MqttException {
         mqttClient.connect();
         mqttClient.subscribe(presenceSensor.PRESENCE_TOPIC);

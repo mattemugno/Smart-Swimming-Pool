@@ -1,9 +1,9 @@
 package it.unipi.aide.iot.coap;
 
-import it.unipi.aide.iot.bean.actuators.ChlorineDispenser;
-import it.unipi.aide.iot.bean.actuators.HeatingSystem;
-import it.unipi.aide.iot.bean.actuators.Light;
-import it.unipi.aide.iot.bean.actuators.WaterPump;
+import it.unipi.aide.iot.bean.coap_actuators.ChlorineDispenser;
+import it.unipi.aide.iot.bean.coap_actuators.HeatingSystem;
+import it.unipi.aide.iot.bean.coap_actuators.Light;
+import it.unipi.aide.iot.bean.coap_actuators.WaterPump;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Response;

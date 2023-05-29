@@ -4,7 +4,6 @@ import it.unipi.aide.iot.bean.samples.ChlorineSample;
 import it.unipi.aide.iot.bean.samples.PresenceSample;
 import it.unipi.aide.iot.bean.samples.TemperatureSample;
 import it.unipi.aide.iot.bean.samples.WaterLevelSample;
-import it.unipi.aide.iot.bean.sensors.ChlorineSensor;
 import it.unipi.aide.iot.config.ConfigurationParameters;
 
 import java.sql.*;

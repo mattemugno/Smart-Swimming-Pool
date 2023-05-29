@@ -1,4 +1,4 @@
-package it.unipi.aide.iot.bean.sensors;
+package it.unipi.aide.iot.bean.mqtt_sensors;
 
 import it.unipi.aide.iot.bean.samples.WaterLevelSample;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
@@ -7,11 +7,7 @@ import java.sql.Timestamp;
 
 public class WaterLevelSensor {
     public final String WATER_LEVEL_TOPIC = "water_level";
-
-    public float getCurrentWaterLevel(){
-        //method to check current temperature by service handlers
-        return 0;
-    }
+    public static float lastWaterLevel;
 
     public void saveWaterLevelSample(WaterLevelSample waterLevelSample){
         //method to store in db the last sample read from broker

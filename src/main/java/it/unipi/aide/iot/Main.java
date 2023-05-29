@@ -18,17 +18,29 @@ public class Main {
         Connection connection = mySqlDbHandler.getConnection();
         System.out.println(connection);
 
-        //implementare USER LOGIC facendogli impostare dei parametri
-        //get current temperature
-        //set heating system
-        //get chlorine level
-        //set chlorine dispenser
-        //get water level
-        //set water pump
-        //set light color
-        //get presence
-        //set lower bound and upper bound for temperature, chlorine and water level
-        //spegni water pump, heating, chlorine
-        //aggiungi qualche analytics o query dal db
+        printCommands();
+    }
+
+    public static void printCommands(){
+        System.out.println("***************************** SMART SWIMMING POOL *****************************\n" +
+                "The following commands are available:\n" +
+                "1) !get_temp --> recovers the last temperature measurement\n" +
+                "2) !set_temp_th <lower bound> <upper bound> --> sets the range within which the temperature must stay in the pool\n" +
+                "3) !start_heater <id> --> starts heating system\n" +
+                "4) !stop_heater <id> --> stops heating system\n" +
+                "5) !get_chlorine --> recovers the last chlorine level measurement\n" +
+                "6) !set_chlorine <lower bound> <upper bound> --> sets the range within which the chlorine must stay in the pool\n" +
+                "7) !start_chlorine <id> --> starts chlorine level dispenser\n" +
+                "8) !stop_chlorine <id> --> stops chlorine level dispenser\n" +
+                "9) !get_water --> recovers the last water level measurement\n" +
+                "10) !set_water_level <lower bound> <upper bound> --> sets the limit below which the water level must stay\n" +
+                "11) !start_water_pump <id> --> starts water pump\n" +
+                "12) !stop_water_pump <id> --> stops water pump\n" +
+                "13) !set_color <id> <color> --> sets the light color (GREEN, YELLOW or RED)\n" +
+                "14) !get_presence --> check if there is someone in the pool\n" +
+                "15) !start_light <id> --> starts light\n" +
+                "16) !stop_light <id> --> stops light\n" +
+                "17) !exit --> terminates the program\n"
+        );
     }
 }

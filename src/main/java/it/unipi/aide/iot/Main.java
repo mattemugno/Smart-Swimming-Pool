@@ -17,5 +17,18 @@ public class Main {
         MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
         Connection connection = mySqlDbHandler.getConnection();
         System.out.println(connection);
+
+        //implementare USER LOGIC facendogli impostare dei parametri
+        //get current temperature
+        //set heating system
+        //get chlorine level
+        //set chlorine dispenser
+        //get water level
+        //set water pump
+        //set light color
+        //get presence
+        //set lower bound and upper bound for temperature, chlorine and water level
+        //spegni water pump, heating, chlorine
+        //aggiungi qualche analytics o query dal db
     }
 }

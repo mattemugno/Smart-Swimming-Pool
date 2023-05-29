@@ -26,4 +26,6 @@ public class ChlorineDispenser {
         MySqlDbHandler.getInstance().removeDevice(ip, "chlorine_dispenser");
         System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
     }
+
+    public void switchChlorineDispenser(){}
 }

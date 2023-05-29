@@ -1,6 +1,8 @@
 package it.unipi.aide.iot.mqtt;
 
 import com.google.gson.Gson;
+import it.unipi.aide.iot.bean.actuators.HeatingSystem;
+import it.unipi.aide.iot.bean.actuators.Light;
 import it.unipi.aide.iot.bean.samples.ChlorineSample;
 import it.unipi.aide.iot.bean.samples.PresenceSample;
 import it.unipi.aide.iot.bean.samples.TemperatureSample;
@@ -75,11 +77,20 @@ public class MQTTSubscriber implements MqttCallback {
     }
 
     @Override
-    public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+    public void messageArrived(String topic, MqttMessage mqttMessage) {
         String payload = new String(mqttMessage.getPayload());
         if (topic.equals(temperatureSensor.TEMPERATURE_TOPIC)){
             TemperatureSample temperatureSample = parser.fromJson(payload, TemperatureSample.class);
             temperatureSensor.saveTemperatureSample(temperatureSample);
+            float currentAvgTemperature = temperatureSensor.getAvgTemperature();
+            if (currentAvgTemperature !=0 & currentAvgTemperature < 25)
+                HeatingSystem.switchHeatingSystem("HOT");
+            else if (currentAvgTemperature !=0 & currentAvgTemperature > 30)
+                HeatingSystem.switchHeatingSystem("COLD");
+            else if (currentAvgTemperature == 0)
+                System.out.println("Not enough samples to compute the average");
+            else if(currentAvgTemperature >= 25 & currentAvgTemperature <=30)
+                HeatingSystem.switchHeatingSystem("OFF");
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){
             WaterLevelSample waterLevelSample = parser.fromJson(payload, WaterLevelSample.class);
@@ -92,6 +103,14 @@ public class MQTTSubscriber implements MqttCallback {
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
             presenceSensor.savePresenceSample(presenceSample);
+            if(presenceSample.isPresence()) {
+                Light.lightSwitch(true);
+                System.out.println("Light switched on");
+            }
+            else if(!presenceSample.isPresence()) {
+                Light.lightSwitch(false);
+                System.out.println("Light switched off");
+            }
         }
         else{
             System.out.println("You are not subscribed to the '" + topic + "' topic");

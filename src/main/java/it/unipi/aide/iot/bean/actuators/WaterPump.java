@@ -25,4 +25,6 @@ public class WaterPump {
         MySqlDbHandler.getInstance().removeDevice(ip, "water_pump");
         System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
     }
+
+    public void switchWaterPump(){}
 }

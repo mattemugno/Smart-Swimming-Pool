@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Light {
-    private final List<CoapClient> clientLightStatusList = new ArrayList<>();
-    private final List<CoapClient> clientLightColorList = new ArrayList<>();
+    private static final List<CoapClient> clientLightStatusList = new ArrayList<>();
+    private static final List<CoapClient> clientLightColorList = new ArrayList<>();
 
     public void registerLight(String ip) {
         CoapClient newClientLightStatus = new CoapClient("coap://[" + ip + "]/light/status");
@@ -34,8 +34,8 @@ public class Light {
         System.out.print("Device removed detached from endpoint and removed from db");
     }
 
-    public void lightSwitch(boolean on) {
-        if(clientLightStatusList == null)
+    public static void lightSwitch(boolean on) {
+        if(clientLightStatusList.size() == 0)
             return;
 
         String msg = "status=" + (on ? "ON" : "OFF");
@@ -59,7 +59,7 @@ public class Light {
     }
 
     public void setLightColor(String color) {
-        if(clientLightColorList == null)
+        if(clientLightColorList.size() == 0)
             return;
 
         if(!Objects.equals(color, "red") & !Objects.equals(color, "green") & !Objects.equals(color, "yellow")) {

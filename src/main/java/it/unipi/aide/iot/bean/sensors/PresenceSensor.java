@@ -5,6 +5,7 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 
 public class PresenceSensor {
     public final String PRESENCE_TOPIC = "presence";
+    public boolean currentPresence;
 
     public float checkPresence(){
         //method to check presence in the pool by service handlers
@@ -13,6 +14,7 @@ public class PresenceSensor {
 
     public void savePresenceSample(PresenceSample presenceSample){
         //method to store in db the last sample read from broker
+        currentPresence = presenceSample.isPresence();
         MySqlDbHandler.getInstance().insertPresenceSample(presenceSample);
     }
 }

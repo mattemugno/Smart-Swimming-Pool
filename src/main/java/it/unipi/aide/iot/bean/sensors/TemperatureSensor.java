@@ -8,16 +8,19 @@ import java.util.Arrays;
 
 public class TemperatureSensor {
     public final String TEMPERATURE_TOPIC = "temperature";
-    public float[] lastTemperatureSamples;
+    public static float[] lastTemperatureSamples;
+    public static float lowerBound;
+    public static float upperBound;
 
     public TemperatureSensor(){
         lastTemperatureSamples = new float[10];
         Arrays.fill(lastTemperatureSamples, 0);
+        lowerBound = 25;
+        upperBound = 30;
     }
 
-    public float getCurrentTemperature(){
-        //method to check current temperature by service handlers
-        return 0;
+    public static float getCurrentTemperature(){
+        return lastTemperatureSamples[lastTemperatureSamples.length - 1];
     }
 
     public float getAvgTemperature()

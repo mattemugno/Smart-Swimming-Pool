@@ -83,13 +83,13 @@ public class MQTTSubscriber implements MqttCallback {
             TemperatureSample temperatureSample = parser.fromJson(payload, TemperatureSample.class);
             temperatureSensor.saveTemperatureSample(temperatureSample);
             float currentAvgTemperature = temperatureSensor.getAvgTemperature();
-            if (currentAvgTemperature !=0 & currentAvgTemperature < 25)
+            if (currentAvgTemperature !=0 & currentAvgTemperature < TemperatureSensor.lowerBound)
                 HeatingSystem.switchHeatingSystem("HOT");
-            else if (currentAvgTemperature !=0 & currentAvgTemperature > 30)
+            else if (currentAvgTemperature !=0 & currentAvgTemperature > TemperatureSensor.upperBound)
                 HeatingSystem.switchHeatingSystem("COLD");
             else if (currentAvgTemperature == 0)
                 System.out.println("Not enough samples to compute the average");
-            else if(currentAvgTemperature >= 25 & currentAvgTemperature <=30)
+            else if(currentAvgTemperature >= TemperatureSensor.lowerBound & currentAvgTemperature <= TemperatureSensor.upperBound)
                 HeatingSystem.switchHeatingSystem("OFF");
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){

@@ -12,6 +12,7 @@ import java.util.Objects;
 public class Light {
     private static final List<CoapClient> clientLightStatusList = new ArrayList<>();
     private static final List<CoapClient> clientLightColorList = new ArrayList<>();
+    public static boolean lastStatus;
 
     public void registerLight(String ip) {
         CoapClient newClientLightStatus = new CoapClient("coap://[" + ip + "]/light/status");
@@ -34,11 +35,12 @@ public class Light {
         System.out.print("Device removed detached from endpoint and removed from db");
     }
 
-    public static void lightSwitch(boolean on) {
+    public static void lightSwitch(boolean status) {
         if(clientLightStatusList.size() == 0)
             return;
 
-        String msg = "status=" + (on ? "ON" : "OFF");
+        String msg = "status=" + (status ? "ON" : "OFF");
+        lastStatus = status;
         for(CoapClient clientLightStatus: clientLightStatusList) {
             //con la put invio all'endpoint di ogni luce il testo desiderato (faccio la put sulla risorsa definita su cooja)
             clientLightStatus.put(new CoapHandler() {

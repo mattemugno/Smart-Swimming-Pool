@@ -2,12 +2,16 @@ package it.unipi.aide.iot.bean.coap_actuators;
 
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapHandler;
+import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WaterPump {
-    private final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
+    public static boolean lastStatus;
+    private static final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
 
     public void registerWaterPump(String ip) {
         CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water_pump");
@@ -26,5 +30,35 @@ public class WaterPump {
         System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
     }
 
-    public void switchWaterPump(){}
+    public static void switchWaterPump(){
+        if(waterPumpEndpoints.size() == 0)
+            return;
+
+        String msg;
+        if(lastStatus) {
+            msg = "OFF";
+            lastStatus = false;
+        }
+        else {
+            msg = "ON";
+            lastStatus = true;
+        }
+
+        for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
+            waterPumpEndpoint.put(new CoapHandler() {
+                @Override
+                public void onLoad(CoapResponse coapResponse) {
+                    if (coapResponse != null) {
+                        if (!coapResponse.isSuccess())
+                            System.out.print("[ERROR]Water Pump Switching: PUT request unsuccessful");
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    System.err.print("[ERROR] Water Pump Switching " + waterPumpEndpoint.getURI() + "]");
+                }
+            }, msg, MediaTypeRegistry.TEXT_PLAIN);
+        }
+    }
 }

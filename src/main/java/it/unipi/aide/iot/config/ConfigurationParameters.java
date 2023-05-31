@@ -23,6 +23,7 @@ public class ConfigurationParameters {
     private String databasePassword;
     private String databaseName;
 
+
     public static ConfigurationParameters getInstance() {
         if (instance == null) {
             synchronized (ConfigurationParameters.class) {
@@ -49,7 +50,7 @@ public class ConfigurationParameters {
             return (ConfigurationParameters) xs.fromXML(text);
         } else {
             System.err.println("Problems with the configuration file!");
-            System.exit(1); // If I can't read the configuration file I can't continue with the program
+            System.exit(1);
         }
         return null;
     }
@@ -86,5 +87,16 @@ public class ConfigurationParameters {
 
     public String getDatabaseName() {
         return databaseName;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfigurationParameters{" +
+                "databaseIp='" + databaseIp + '\'' +
+                ", databasePort=" + databasePort +
+                ", databaseUsername='" + databaseUsername + '\'' +
+                ", databasePassword='" + databasePassword + '\'' +
+                ", databaseName='" + databaseName + '\'' +
+                '}';
     }
 }

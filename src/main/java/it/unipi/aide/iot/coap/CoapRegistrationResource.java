@@ -25,6 +25,7 @@ public class CoapRegistrationResource extends CoapResource {
     @Override
     public void handleGET(CoapExchange exchange) {
         Response response = new Response(CoAP.ResponseCode.CONTENT);
+        System.out.println(response);
     }
 
     @Override

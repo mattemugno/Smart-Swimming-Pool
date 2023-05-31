@@ -24,7 +24,8 @@ public class PoolControlSystem {
         coapRegistrationServer.start();
         new MQTTSubscriber();
         MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
-        mySqlDbHandler.getConnection();
+        Connection connection = mySqlDbHandler.getConnection();
+        System.out.println(connection);
 
         printCommands();
 
@@ -148,6 +149,9 @@ public class PoolControlSystem {
         if (arguments.length != 2){
             System.out.println("Missing argument/s in the request");
             return;
+        }
+        if(!Objects.equals(arguments[1], "HOT") & !Objects.equals(arguments[1], "COLD")){
+            System.out.println("Not valid mode");
         }
         HeatingSystem.switchHeatingSystem(arguments[1]);
     }

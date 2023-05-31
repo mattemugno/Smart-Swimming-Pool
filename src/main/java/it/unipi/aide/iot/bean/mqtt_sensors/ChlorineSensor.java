@@ -11,6 +11,7 @@ public class ChlorineSensor {
 
     public void saveChlorineSample(ChlorineSample chlorineSample){
         //method to store in db the last sample read from broker
+        lastChlorineLevel = chlorineSample.getChlorineLevel();
         MySqlDbHandler.getInstance().insertChlorineSample(chlorineSample);
 
     }

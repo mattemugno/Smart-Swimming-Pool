@@ -116,9 +116,8 @@ public class MySqlDbHandler {
         {
             statement.setString(1, ip);
             statement.setString(2, device);
-            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-            Date date = new Date(System.currentTimeMillis());
-            statement.setDate(3, Date.valueOf(formatter.format(date)));
+            Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+            statement.setDate(3, sqlDate);
             statement.setString(4, "active");
             statement.executeUpdate();
         }

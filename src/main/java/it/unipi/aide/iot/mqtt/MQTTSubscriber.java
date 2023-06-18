@@ -48,17 +48,22 @@ public class MQTTSubscriber implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) {
         String payload = new String(mqttMessage.getPayload());
+
         if (topic.equals(temperatureSensor.TEMPERATURE_TOPIC)){
             TemperatureSample temperatureSample = parser.fromJson(payload, TemperatureSample.class);
             temperatureSensor.saveTemperatureSample(temperatureSample);
             float currentAvgTemperature = temperatureSensor.getAvgTemperature();
+
             if (currentAvgTemperature !=0 & currentAvgTemperature < TemperatureSensor.lowerBound)
                 HeatingSystem.switchHeatingSystem("HOT");
+
             else if (currentAvgTemperature !=0 & currentAvgTemperature > TemperatureSensor.upperBound)
                 HeatingSystem.switchHeatingSystem("COLD");
+
             else if (currentAvgTemperature == 0)
-                System.out.println("Not enough samples to compute the average");
-            else if(currentAvgTemperature >= TemperatureSensor.lowerBound & currentAvgTemperature <= TemperatureSensor.upperBound)
+                System.out.println("Not enough samples collected");
+
+            else if((HeatingSystem.isStatus()) & (currentAvgTemperature >= TemperatureSensor.lowerBound & currentAvgTemperature <= TemperatureSensor.upperBound))
                 HeatingSystem.switchHeatingSystem("OFF");
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){
@@ -72,11 +77,11 @@ public class MQTTSubscriber implements MqttCallback {
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
             presenceSensor.savePresenceSample(presenceSample);
-            if(presenceSample.isPresence()) {
+            if((presenceSample.isPresence()) & (!Light.isLastStatus())) {
                 Light.lightSwitch(true);
                 System.out.println("Light switched on");
             }
-            else if(!presenceSample.isPresence()) {
+            else if((!presenceSample.isPresence()) & (Light.isLastStatus())) {
                 Light.lightSwitch(false);
                 System.out.println("Light switched off");
             }

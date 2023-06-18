@@ -8,9 +8,11 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HeatingSystem {
     private static final List<CoapClient> heatingSystemEndpoints = new ArrayList<>();
+    private static boolean status = false;
 
     public void registerHeatingSystem(String ip) {
         CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system");
@@ -32,16 +34,21 @@ public class HeatingSystem {
     public static void switchHeatingSystem(String mode){
         if(heatingSystemEndpoints.size() == 0)
             return;
+        if (!Objects.equals(mode, "OFF"))
+            status = true;
+        else
+            status = false;
 
         String msg = "mode=" + mode;
 
+        //li accendo tutti insieme, quindi mando un coap message per ogni heating system registrato
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
             heatingSystemEndpoint.put(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {
                         if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Heater Switching: PUT request unsuccessful");
+                            System.out.print("[ERROR] Heater Switching: PUT request unsuccessful");
                     }
                 }
 
@@ -51,5 +58,9 @@ public class HeatingSystem {
                 }
             }, msg, MediaTypeRegistry.TEXT_PLAIN);
         }
+    }
+
+    public static boolean isStatus() {
+        return status;
     }
 }

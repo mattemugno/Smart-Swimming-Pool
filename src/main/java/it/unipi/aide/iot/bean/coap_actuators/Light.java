@@ -85,5 +85,7 @@ public class Light {
         }
     }
 
-
+    public static boolean isLastStatus() {
+        return lastStatus;
+    }
 }

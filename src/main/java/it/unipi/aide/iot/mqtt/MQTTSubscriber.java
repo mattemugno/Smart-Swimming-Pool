@@ -50,6 +50,10 @@ public class MQTTSubscriber implements MqttCallback {
         }while(!mqttClient.isConnected());
     }
 
+    public MqttClient getMqttClient() {
+        return mqttClient;
+    }
+
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) throws MqttException {
         String payload = new String(mqttMessage.getPayload());

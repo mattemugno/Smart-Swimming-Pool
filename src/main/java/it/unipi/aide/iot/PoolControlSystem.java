@@ -26,19 +26,16 @@ import java.util.Objects;
 
 public class PoolControlSystem {
     public static void main(String[] args) throws SQLException, MqttException {
-        String BROKER = "tcp://127.0.0.1:1883";
-        String CLIENT_ID = "RemoteControlApp";
         PresenceSensor presenceSensor = new PresenceSensor();
         ChlorineSensor chlorineSensor = new ChlorineSensor();
         WaterLevelSensor waterLevelSensor = new WaterLevelSensor();
         TemperatureSensor temperatureSensor = new TemperatureSensor();
         CoapRegistrationServer coapRegistrationServer = new CoapRegistrationServer();
         coapRegistrationServer.start();
-        new MQTTSubscriber();
+        MQTTSubscriber mqttSubscriber = new MQTTSubscriber();
         MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
         Connection connection = mySqlDbHandler.getConnection();
-        MqttClient mqttClient = new MqttClient(BROKER, CLIENT_ID);
-        mqttClient.connect();
+        MqttClient mqttClient = mqttSubscriber.getMqttClient();
 
         printCommands();
 

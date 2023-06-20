@@ -7,13 +7,13 @@ import java.sql.Timestamp;
 
 public class WaterLevelSensor {
     public final String WATER_LEVEL_TOPIC = "water_level";
-    public static float currentWaterLevel;
-    public static float upperBound;
-    public static float lowerBound;
+    public static int currentWaterLevel;
+    public static int upperBound;
+    public static int lowerBound;
 
     public WaterLevelSensor(){
-        lowerBound = 1.5F;
-        upperBound = 2;
+        lowerBound = 50;
+        upperBound = 90;
     }
 
     public void saveWaterLevelSample(WaterLevelSample waterLevelSample){
@@ -23,7 +23,7 @@ public class WaterLevelSensor {
         currentWaterLevel = waterLevelSample.getHeight();
     }
 
-    public static float getCurrentWaterLevel(){
+    public static int getCurrentWaterLevel(){
         return currentWaterLevel;
     }
 

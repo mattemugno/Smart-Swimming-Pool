@@ -4,10 +4,10 @@ import java.sql.Timestamp;
 
 public class WaterLevelSample {
     private int nodeId;
-    private float height;
+    private int height;
     private Timestamp timestamp;
 
-    public WaterLevelSample(int nodeId, float height, Timestamp timestamp) {
+    public WaterLevelSample(int nodeId, int height, Timestamp timestamp) {
         this.nodeId = nodeId;
         this.height = height;
         this.timestamp = timestamp;
@@ -21,11 +21,11 @@ public class WaterLevelSample {
         this.nodeId = nodeId;
     }
 
-    public float getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public void setHeight(float height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 

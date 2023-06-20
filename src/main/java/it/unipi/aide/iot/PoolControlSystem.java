@@ -11,20 +11,33 @@ import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
 import it.unipi.aide.iot.coap.CoapRegistrationServer;
 import it.unipi.aide.iot.mqtt.MQTTSubscriber;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.simple.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
 
 public class PoolControlSystem {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, MqttException {
+        String BROKER = "tcp://127.0.0.1:1883";
+        String CLIENT_ID = "RemoteControlApp";
+        PresenceSensor presenceSensor = new PresenceSensor();
+        ChlorineSensor chlorineSensor = new ChlorineSensor();
+        WaterLevelSensor waterLevelSensor = new WaterLevelSensor();
+        TemperatureSensor temperatureSensor = new TemperatureSensor();
         CoapRegistrationServer coapRegistrationServer = new CoapRegistrationServer();
         coapRegistrationServer.start();
         new MQTTSubscriber();
         MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
         Connection connection = mySqlDbHandler.getConnection();
+        MqttClient mqttClient = new MqttClient(BROKER, CLIENT_ID);
         System.out.println(connection);
 
         printCommands();
@@ -66,10 +79,10 @@ public class PoolControlSystem {
                         getWaterLevel(WaterLevelSensor.getCurrentWaterLevel());
                         break;
                     case "!set_water_level":
-                        setWaterLevel(arguments);
+                        setWaterLevel(arguments, waterLevelSensor.WATER_LEVEL_TOPIC,mqttClient);
                         break;
                     case "!start_water_pump":
-                        startWaterPump();
+                        startWaterPump(arguments);
                         break;
                     case "!stop_water_pump":
                         stopWaterPump();
@@ -116,8 +129,8 @@ public class PoolControlSystem {
                 "8) !stop_chlorine <id> --> stops chlorine level dispenser\n" +
                 "9) !get_water_level --> recovers the last water level measurement\n" +
                 "10) !set_water_level <lower bound> <upper bound> --> sets the limit below which the water level must stay\n" +
-                "11) !start_water_pump <id> --> starts water pump\n" +
-                "12) !stop_water_pump <id> --> stops water pump\n" +
+                "11) !start_water_pump <mode> --> starts water pump\n" +
+                "12) !stop_water_pump --> stops water pump\n" +
                 "13) !set_color <id> <color> --> sets the light color (GREEN, YELLOW or RED)\n" +
                 "14) !get_presence --> check if there is someone in the pool\n" +
                 "15) !start_light <id> --> starts light\n" +
@@ -198,33 +211,48 @@ public class PoolControlSystem {
         System.out.println("Current water level is: " + currentWaterLevel);
     }
 
-    private static void setWaterLevel(String[] arguments) {
-        if (arguments.length != 3){
+    private static void setWaterLevel(String[] arguments, String WATER_LEVEL_TOPIC, MqttClient mqttClient) throws MqttException {
+        if (arguments.length != 2){
             System.out.println("Missing argument in the request");
             return;
         }
-        float lowerBound = Float.parseFloat(arguments[1]);
-        float upperBound = Float.parseFloat(arguments[2]);
+        int lowerBound = Integer.parseInt(arguments[0]);
+        int upperBound = Integer.parseInt(arguments[1]);
         if(upperBound < lowerBound) {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
         }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("min", lowerBound);
+        jsonObject.put("max", upperBound);
+
+        String payload = jsonObject.toString();
+        mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         WaterLevelSensor.lowerBound = lowerBound;
         WaterLevelSensor.upperBound = upperBound;
     }
 
-    private static void startWaterPump() {
+    private static void startWaterPump(String[] arguments) {
+        if (arguments.length != 1){
+            System.out.println("Missing argument in the request");
+            return;
+        }
         if(WaterPump.lastStatus)
             System.out.println("Water pump is already active");
-        else
-            WaterPump.switchWaterPump("INC");
+        else {
+            if (!Objects.equals(arguments[0], "INC") & !Objects.equals(arguments[0], "DEC")) {
+                System.out.println("Not valid mode");
+                return;
+            }
+            WaterPump.switchWaterPump(arguments[0]);
+        }
     }
 
     private static void stopWaterPump() {
         if(!WaterPump.lastStatus)
             System.out.println("Water pump is already off");
         else
-            WaterPump.switchWaterPump("DEC");
+            WaterPump.switchWaterPump("OFF");
     }
 
     private static void setLightColor(String[] arguments) {

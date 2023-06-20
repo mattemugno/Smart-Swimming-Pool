@@ -8,9 +8,11 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class WaterPump {
     public static boolean lastStatus;
+    private static boolean status = false;
     private static final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
 
     public void registerWaterPump(String ip) {
@@ -30,19 +32,12 @@ public class WaterPump {
         System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
     }
 
-    public static void switchWaterPump(){
+    public static void switchWaterPump(String mode){
         if(waterPumpEndpoints.size() == 0)
             return;
 
-        String msg;
-        if(lastStatus) {
-            msg = "OFF";
-            lastStatus = false;
-        }
-        else {
-            msg = "ON";
-            lastStatus = true;
-        }
+        String msg = "mode?=" + mode;
+        status = !Objects.equals(mode, "OFF");
 
         for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
             waterPumpEndpoint.put(new CoapHandler() {
@@ -60,5 +55,9 @@ public class WaterPump {
                 }
             }, msg, MediaTypeRegistry.TEXT_PLAIN);
         }
+    }
+
+    public static boolean isStatus() {
+        return status;
     }
 }

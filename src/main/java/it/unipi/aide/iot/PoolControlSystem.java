@@ -154,6 +154,7 @@ public class PoolControlSystem {
             System.out.println("Not valid mode");
         }
         HeatingSystem.switchHeatingSystem(arguments[1]);
+
     }
 
     private static void stopHeater() {
@@ -216,14 +217,14 @@ public class PoolControlSystem {
         if(WaterPump.lastStatus)
             System.out.println("Water pump is already active");
         else
-            WaterPump.switchWaterPump();
+            WaterPump.switchWaterPump("INC");
     }
 
     private static void stopWaterPump() {
         if(!WaterPump.lastStatus)
             System.out.println("Water pump is already off");
         else
-            WaterPump.switchWaterPump();
+            WaterPump.switchWaterPump("DEC");
     }
 
     private static void setLightColor(String[] arguments) {

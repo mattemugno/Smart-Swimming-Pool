@@ -94,11 +94,15 @@ public class MQTTSubscriber implements MqttCallback {
             }
 
             if (a == 3){
-                WaterPump.switchWaterPump();
-                mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+                WaterPump.switchWaterPump("INC");
+                mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
             }
             else if (b == 3){
-                WaterPump.switchWaterPump();
+                WaterPump.switchWaterPump("DEC");
+                mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
+            }
+            else if (WaterPump.isStatus() & (currentWaterLevel >= WaterLevelSensor.lowerBound & currentWaterLevel <= WaterLevelSensor.upperBound)){
+                WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }
 

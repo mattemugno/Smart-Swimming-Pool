@@ -122,16 +122,16 @@ public class PoolControlSystem {
                 "4) !stop_heater --> stops heating system\n" +
                 "5) !get_chlorine --> recovers the last chlorine level measurement\n" +
                 "6) !set_chlorine <lower bound> <upper bound> --> sets the range within which the chlorine must stay in the pool\n" +
-                "7) !start_chlorine <id> --> starts chlorine level dispenser\n" +
-                "8) !stop_chlorine <id> --> stops chlorine level dispenser\n" +
+                "7) !start_chlorine --> starts chlorine level dispenser\n" +
+                "8) !stop_chlorine --> stops chlorine level dispenser\n" +
                 "9) !get_water_level --> recovers the last water level measurement\n" +
                 "10) !set_water_level <lower bound> <upper bound> --> sets the limit below which the water level must stay\n" +
                 "11) !start_water_pump <mode> --> starts water pump\n" +
                 "12) !stop_water_pump --> stops water pump\n" +
-                "13) !set_color <id> <color> --> sets the light color (GREEN, YELLOW or RED)\n" +
+                "13) !set_color <color> --> sets the light color (GREEN, YELLOW or RED)\n" +
                 "14) !get_presence --> check if there is someone in the pool\n" +
-                "15) !start_light <id> --> starts light\n" +
-                "16) !stop_light <id> --> stops light\n" +
+                "15) !start_light --> starts light\n" +
+                "16) !stop_light --> stops light\n" +
                 "17) !exit --> terminates the program\n"
         );
     }
@@ -142,7 +142,7 @@ public class PoolControlSystem {
 
     private static void setTemperatureBounds(String[] arguments) {
         if (arguments.length != 3){
-            System.out.println("Missing argument in the request");
+            System.out.println("Incorrect number of arguments in the request");
             return;
         }
         float lowerBound = Float.parseFloat(arguments[1]);
@@ -204,7 +204,7 @@ public class PoolControlSystem {
             ChlorineDispenser.switchChlorineDispenser();
     }
 
-    private static void getWaterLevel(float currentWaterLevel) {
+    private static void getWaterLevel(int currentWaterLevel) {
         System.out.println("Current water level is: " + currentWaterLevel);
     }
 

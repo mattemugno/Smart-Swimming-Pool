@@ -82,14 +82,15 @@ public class MQTTSubscriber implements MqttCallback {
             }
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){
+            System.out.println("Sample ricevuto: " + payload);
             WaterLevelSample waterLevelSample = parser.fromJson(payload, WaterLevelSample.class);
             waterLevelSensor.saveWaterLevelSample(waterLevelSample);
-            float currentWaterLevel = WaterLevelSensor.getCurrentWaterLevel();
+            int currentWaterLevel = WaterLevelSensor.getCurrentWaterLevel();
 
-            if (currentWaterLevel !=0 & currentWaterLevel < WaterLevelSensor.lowerBound)
+            if (currentWaterLevel < WaterLevelSensor.lowerBound)
                 a += 1;
 
-            else if (currentWaterLevel !=0 & currentWaterLevel > WaterLevelSensor.upperBound)
+            else if (currentWaterLevel > WaterLevelSensor.upperBound)
                 b += 1;
 
             else {
@@ -103,10 +104,12 @@ public class MQTTSubscriber implements MqttCallback {
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
             }
             else if (b == 3){
+                System.out.println("Accendi in modalita DEC");
                 WaterPump.switchWaterPump("DEC");
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
             }
             else if (WaterPump.isStatus() & (currentWaterLevel >= WaterLevelSensor.lowerBound & currentWaterLevel <= WaterLevelSensor.upperBound)){
+                System.out.println("Spegni water pump");
                 WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }

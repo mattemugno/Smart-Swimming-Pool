@@ -249,7 +249,7 @@ public class PoolControlSystem {
     }
 
     private static void stopWaterPump(String topic, MqttClient mqttClient) throws MqttException {
-        if(!WaterPump.lastStatus)
+        if(!WaterPump.isStatus())
             System.out.println("Water pump is already off");
         else {
             WaterPump.switchWaterPump("OFF");

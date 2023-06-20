@@ -7,10 +7,10 @@ public class WaterLevelSample {
     private int height;
     private Timestamp timestamp;
 
-    public WaterLevelSample(int nodeId, int height, Timestamp timestamp) {
+    public WaterLevelSample(int nodeId, int height) {
         this.nodeId = nodeId;
         this.height = height;
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
     public int getNodeId() {

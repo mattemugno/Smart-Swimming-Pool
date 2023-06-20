@@ -211,12 +211,12 @@ public class PoolControlSystem {
     }
 
     private static void setWaterLevel(String[] arguments, String WATER_LEVEL_TOPIC, MqttClient mqttClient) throws MqttException {
-        if (arguments.length != 2){
+        if (arguments.length != 3){
             System.out.println("Missing argument in the request");
             return;
         }
-        int lowerBound = Integer.parseInt(arguments[0]);
-        int upperBound = Integer.parseInt(arguments[1]);
+        int lowerBound = Integer.parseInt(arguments[1]);
+        int upperBound = Integer.parseInt(arguments[2]);
         if(upperBound < lowerBound) {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
@@ -232,19 +232,19 @@ public class PoolControlSystem {
     }
 
     private static void startWaterPump(String[] arguments, String WATER_LEVEL_TOPIC, MqttClient mqttClient) throws MqttException {
-        if (arguments.length != 1){
+        if (arguments.length < 2){
             System.out.println("Missing argument in the request");
             return;
         }
         if(WaterPump.lastStatus)
             System.out.println("Water pump is already active");
         else {
-            if (!Objects.equals(arguments[0], "INC") & !Objects.equals(arguments[0], "DEC")) {
+            if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
                 System.out.println("Not valid mode");
                 return;
             }
-            WaterPump.switchWaterPump(arguments[0]);
-            mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage(arguments[0].getBytes(StandardCharsets.UTF_8)));
+            WaterPump.switchWaterPump(arguments[1]);
+            mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
 
         }
     }

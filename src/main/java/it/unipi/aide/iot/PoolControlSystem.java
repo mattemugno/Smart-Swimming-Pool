@@ -245,6 +245,7 @@ public class PoolControlSystem {
             }
             WaterPump.switchWaterPump(arguments[1]);
             mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Water pump started in " + arguments[1] + " mode");
 
         }
     }
@@ -252,9 +253,11 @@ public class PoolControlSystem {
     private static void stopWaterPump(String WATER_LEVEL_TOPIC, MqttClient mqttClient) throws MqttException {
         if(!WaterPump.lastStatus)
             System.out.println("Water pump is already off");
-        else
+        else {
             WaterPump.switchWaterPump("OFF");
-        mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Water pump switched OFF");
+        }
 
     }
 

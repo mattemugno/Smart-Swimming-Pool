@@ -11,10 +11,16 @@ public class WaterLevelSensor {
     public static float upperBound;
     public static float lowerBound;
 
+    public WaterLevelSensor(){
+        lowerBound = 1.5F;
+        upperBound = 2;
+    }
+
     public void saveWaterLevelSample(WaterLevelSample waterLevelSample){
         //method to store in db the last sample read from broker
         waterLevelSample.setTimestamp(new Timestamp(System.currentTimeMillis()));
         MySqlDbHandler.getInstance().insertWaterLevelSample(waterLevelSample);
+        currentWaterLevel = waterLevelSample.getHeight();
     }
 
     public static float getCurrentWaterLevel(){

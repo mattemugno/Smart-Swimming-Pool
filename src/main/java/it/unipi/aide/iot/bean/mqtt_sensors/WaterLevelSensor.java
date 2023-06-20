@@ -18,7 +18,6 @@ public class WaterLevelSensor {
 
     public void saveWaterLevelSample(WaterLevelSample waterLevelSample){
         //method to store in db the last sample read from broker
-        waterLevelSample.setTimestamp(new Timestamp(System.currentTimeMillis()));
         MySqlDbHandler.getInstance().insertWaterLevelSample(waterLevelSample);
         currentWaterLevel = waterLevelSample.getHeight();
     }

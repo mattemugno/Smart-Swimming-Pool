@@ -21,7 +21,7 @@ public class Light {
         clientLightStatusList.add(newClientLightStatus);
         clientLightColorList.add(newClientLightColor);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "light");
-        System.out.print("[REGISTRATION] The light: [" + ip + "] is now registered");
+        System.out.print("[REGISTRATION] The light: [" + ip + "] is now registered\n");
     }
 
     public void unregisterLight(String ip) {

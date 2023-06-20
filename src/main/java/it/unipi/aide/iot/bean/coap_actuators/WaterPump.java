@@ -22,7 +22,7 @@ public class WaterPump {
         CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water-pump/switch");
         waterPumpEndpoints.add(waterPumpEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "water-pump");
-        System.out.print("[REGISTRATION] The water pump: [" + ip + "] is now registered");
+        System.out.print("[REGISTRATION] The water pump: [" + ip + "] is now registered\n");
     }
 
     public void unregisterWaterPump(String ip) {
@@ -32,7 +32,7 @@ public class WaterPump {
             }
         }
         MySqlDbHandler.getInstance().removeDevice(ip, "water-pump");
-        System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
+        System.out.print("Device " + ip + " removed detached from endpoint and removed from db\n");
     }
 
     public static void switchWaterPump(String mode){
@@ -60,7 +60,7 @@ public class WaterPump {
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {
                         if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Water Pump Switching: POST request unsuccessful");
+                            System.out.print("[ERROR]Water Pump Switching: POST request unsuccessful\n");
                     }
                 }
 

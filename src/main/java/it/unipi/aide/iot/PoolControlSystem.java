@@ -76,13 +76,13 @@ public class PoolControlSystem {
                         getWaterLevel(WaterLevelSensor.getCurrentWaterLevel());
                         break;
                     case "!set_water_level":
-                        setWaterLevel(arguments, "water-level-command", mqttClient);
+                        setWaterLevel(arguments, mqttClient);
                         break;
                     case "!start_water_pump":
-                        startWaterPump(arguments, "water-level-command", mqttClient);
+                        startWaterPump(arguments, mqttClient);
                         break;
                     case "!stop_water_pump":
-                        stopWaterPump("water-level-command", mqttClient);
+                        stopWaterPump(mqttClient);
                         break;
                     case "!get_presence":
                         getPresence();
@@ -208,7 +208,7 @@ public class PoolControlSystem {
         System.out.println("Current water level is: " + currentWaterLevel);
     }
 
-    private static void setWaterLevel(String[] arguments, String topic, MqttClient mqttClient) throws MqttException {
+    private static void setWaterLevel(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 3){
             System.out.println("Missing argument in the request");
             return;
@@ -224,12 +224,12 @@ public class PoolControlSystem {
         jsonObject.put("max", upperBound);
 
         String payload = jsonObject.toString();
-        mqttClient.publish(topic, new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
+        mqttClient.publish("water-level-command", new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         WaterLevelSensor.lowerBound = lowerBound;
         WaterLevelSensor.upperBound = upperBound;
     }
 
-    private static void startWaterPump(String[] arguments, String topic, MqttClient mqttClient) throws MqttException {
+    private static void startWaterPump(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length < 2){
             System.out.println("Missing argument in the request");
             return;
@@ -241,19 +241,20 @@ public class PoolControlSystem {
                 System.out.println("Not valid mode");
                 return;
             }
+            System.out.println(arguments[1]);
             WaterPump.switchWaterPump(arguments[1]);
-            mqttClient.publish(topic, new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish("water-level-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
             System.out.println("Water pump started in " + arguments[1] + " mode");
 
         }
     }
 
-    private static void stopWaterPump(String topic, MqttClient mqttClient) throws MqttException {
+    private static void stopWaterPump(MqttClient mqttClient) throws MqttException {
         if(!WaterPump.isStatus())
             System.out.println("Water pump is already off");
         else {
             WaterPump.switchWaterPump("OFF");
-            mqttClient.publish(topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish("water-level-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Water pump switched OFF");
         }
 

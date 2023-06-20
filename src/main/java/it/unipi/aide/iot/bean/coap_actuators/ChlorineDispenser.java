@@ -18,7 +18,7 @@ public class ChlorineDispenser {
         CoapClient chlorineDispenserEndpoint = new CoapClient("coap://[" + ip + "]/chlorine_dispenser");
         chlorineDispenserEndpoints.add(chlorineDispenserEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "chlorine_dispenser");
-        System.out.print("[REGISTRATION] The chlorine dispenser: [" + ip + "] is now registered");
+        System.out.print("[REGISTRATION] The chlorine dispenser: [" + ip + "] is now registered\n");
     }
 
     public void unregisterChlorineDispenser(String ip) {
@@ -28,7 +28,7 @@ public class ChlorineDispenser {
             }
         }
         MySqlDbHandler.getInstance().removeDevice(ip, "chlorine_dispenser");
-        System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
+        System.out.print("Device " + ip + " removed detached from endpoint and removed from db\n");
     }
 
     public static void switchChlorineDispenser(){

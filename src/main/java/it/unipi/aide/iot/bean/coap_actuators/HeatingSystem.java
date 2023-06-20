@@ -18,7 +18,7 @@ public class HeatingSystem {
         CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system");
         heatingSystemEndpoints.add(heatingSystemEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "heating_system");
-        System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered");
+        System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered\n");
     }
 
     public void unregisterHeatingSystem(String ip) {
@@ -28,7 +28,7 @@ public class HeatingSystem {
             }
         }
         MySqlDbHandler.getInstance().removeDevice(ip, "heating_system");
-        System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
+        System.out.print("Device " + ip + " removed detached from endpoint and removed from db\n");
     }
 
     public static void switchHeatingSystem(String mode){

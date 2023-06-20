@@ -36,7 +36,7 @@ public class MySqlDbHandler {
 
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:mysql://"+ databaseIp + ":" + databasePort +
-                        "/" + databaseName + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=CET",
+                        "/" + databaseName + "?useSSL=NO&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=CET",
                 databaseUsername, databasePassword);
     }
 
@@ -76,12 +76,12 @@ public class MySqlDbHandler {
     public void insertWaterLevelSample(WaterLevelSample waterLevelSample) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO temperature (timestamp, node, height) VALUES (?, ?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO WaterLevel (nodeId, height, timestamp) VALUES (?, ?, ?)")
         )
         {
-            statement.setTimestamp(1, waterLevelSample.getTimestamp());
-            statement.setInt(2, waterLevelSample.getNodeId());
-            statement.setFloat(3, waterLevelSample.getHeight());
+            statement.setInt(1, waterLevelSample.getNodeId());
+            statement.setFloat(2, waterLevelSample.getHeight());
+            statement.setTimestamp(3, waterLevelSample.getTimestamp());
             statement.executeUpdate();
         }
         catch (final SQLException e)

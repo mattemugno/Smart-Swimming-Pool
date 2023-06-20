@@ -3,6 +3,6 @@
     <databaseIp>localhost</databaseIp>
     <databasePort>3306</databasePort>
     <databaseUsername>root</databaseUsername>
-    <databasePassword>studenti</databasePassword>
+    <databasePassword>password</databasePassword>
     <databaseName>smart_swimming_pool</databaseName>
 </it.unipi.aide.iot.config.ConfigurationParameters>

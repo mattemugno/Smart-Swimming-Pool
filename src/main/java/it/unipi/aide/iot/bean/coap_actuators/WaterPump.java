@@ -4,7 +4,10 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
+import org.eclipse.californium.core.coap.Option;
+import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +40,21 @@ public class WaterPump {
             return;
 
         String msg = "mode?=" + mode;
+        CoapResponse response = null;
         status = !Objects.equals(mode, "OFF");
-
+        Request req = new Request(CoAP.Code.POST);
+        req.getOptions().addUriQuery("mode=" + mode);
         for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
+            response = waterPumpEndpoint.advanced(req);
+            if (response != null) {
+                System.out.println("Response: " + response.getResponseText());
+                System.out.println("Payload: " + response.getPayload());
+            } else
+                System.out.println("Request failed");
+        }
+
+
+        /*for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
             waterPumpEndpoint.post(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
@@ -54,7 +69,7 @@ public class WaterPump {
                     System.err.print("[ERROR] Water Pump Switching " + waterPumpEndpoint.getURI() + "]");
                 }
             }, msg, MediaTypeRegistry.TEXT_PLAIN);
-        }
+        }*/
     }
 
     public static boolean isStatus() {

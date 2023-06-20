@@ -98,6 +98,7 @@ public class MQTTSubscriber implements MqttCallback {
             }
 
             if (a == 3){
+                System.out.println("Accendi in modalita INC");
                 WaterPump.switchWaterPump("INC");
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
             }

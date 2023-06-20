@@ -6,7 +6,7 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import java.sql.Timestamp;
 
 public class WaterLevelSensor {
-    public final String WATER_LEVEL_TOPIC = "water_level";
+    public final String WATER_LEVEL_TOPIC = "water-level";
     public static int currentWaterLevel;
     public static int upperBound;
     public static int lowerBound;

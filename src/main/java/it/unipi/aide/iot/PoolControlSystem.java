@@ -38,7 +38,6 @@ public class PoolControlSystem {
         MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
         Connection connection = mySqlDbHandler.getConnection();
         MqttClient mqttClient = new MqttClient(BROKER, CLIENT_ID);
-        System.out.println(connection);
 
         printCommands();
 

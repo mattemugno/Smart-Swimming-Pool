@@ -10,6 +10,7 @@ import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,8 +40,7 @@ public class WaterPump {
         if(waterPumpEndpoints.size() == 0)
             return;
 
-        String msg = "mode?=" + mode;
-        CoapResponse response = null;
+        CoapResponse response;
         status = !Objects.equals(mode, "OFF");
         Request req = new Request(CoAP.Code.POST);
         req.getOptions().addUriQuery("mode=" + mode);
@@ -48,28 +48,10 @@ public class WaterPump {
             response = waterPumpEndpoint.advanced(req);
             if (response != null) {
                 System.out.println("Response: " + response.getResponseText());
-                System.out.println("Payload: " + response.getPayload());
+                System.out.println("Payload: " + Arrays.toString(response.getPayload()));
             } else
                 System.out.println("Request failed");
         }
-
-
-        /*for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
-            waterPumpEndpoint.post(new CoapHandler() {
-                @Override
-                public void onLoad(CoapResponse coapResponse) {
-                    if (coapResponse != null) {
-                        if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Water Pump Switching: POST request unsuccessful\n");
-                    }
-                }
-
-                @Override
-                public void onError() {
-                    System.err.print("[ERROR] Water Pump Switching " + waterPumpEndpoint.getURI() + "]");
-                }
-            }, msg, MediaTypeRegistry.TEXT_PLAIN);
-        }*/
     }
 
     public static boolean isStatus() {

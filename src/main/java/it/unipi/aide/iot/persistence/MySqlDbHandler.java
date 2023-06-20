@@ -141,4 +141,18 @@ public class MySqlDbHandler {
             e.printStackTrace();
         }
     }
+
+    public void removeAllDevices() {
+        try (
+                Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement("DELETE * FROM actuators")
+        )
+        {
+            statement.executeUpdate();
+        }
+        catch (final SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

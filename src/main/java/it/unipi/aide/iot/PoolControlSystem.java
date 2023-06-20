@@ -97,6 +97,7 @@ public class PoolControlSystem {
                         stopLight();
                         break;
                     case "!exit":
+                        MySqlDbHandler.getInstance().removeAllDevices();
                         System.out.println("Bye!");
                         coapRegistrationServer.stop();
                         System.exit(0);

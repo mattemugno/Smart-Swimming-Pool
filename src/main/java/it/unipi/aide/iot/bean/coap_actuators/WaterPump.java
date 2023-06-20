@@ -16,9 +16,9 @@ public class WaterPump {
     private static final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
 
     public void registerWaterPump(String ip) {
-        CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water_pump");
+        CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water-pump/switch");
         waterPumpEndpoints.add(waterPumpEndpoint);
-        MySqlDbHandler.getInstance().insertNewDevice(ip, "water_pump");
+        MySqlDbHandler.getInstance().insertNewDevice(ip, "water-pump");
         System.out.print("[REGISTRATION] The water pump: [" + ip + "] is now registered");
     }
 
@@ -28,7 +28,7 @@ public class WaterPump {
                 waterPumpEndpoints.remove(i);
             }
         }
-        MySqlDbHandler.getInstance().removeDevice(ip, "water_pump");
+        MySqlDbHandler.getInstance().removeDevice(ip, "water-pump");
         System.out.print("Device " + ip + " removed detached from endpoint and removed from db");
     }
 
@@ -40,12 +40,12 @@ public class WaterPump {
         status = !Objects.equals(mode, "OFF");
 
         for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
-            waterPumpEndpoint.put(new CoapHandler() {
+            waterPumpEndpoint.post(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {
                         if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Water Pump Switching: PUT request unsuccessful");
+                            System.out.print("[ERROR]Water Pump Switching: POST request unsuccessful");
                     }
                 }
 

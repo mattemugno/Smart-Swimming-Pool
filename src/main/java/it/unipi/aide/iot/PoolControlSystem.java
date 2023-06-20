@@ -78,13 +78,13 @@ public class PoolControlSystem {
                         getWaterLevel(WaterLevelSensor.getCurrentWaterLevel());
                         break;
                     case "!set_water_level":
-                        setWaterLevel(arguments, waterLevelSensor.WATER_LEVEL_TOPIC,mqttClient);
+                        setWaterLevel(arguments, waterLevelSensor.WATER_LEVEL_TOPIC, mqttClient);
                         break;
                     case "!start_water_pump":
-                        startWaterPump(arguments);
+                        startWaterPump(arguments, waterLevelSensor.WATER_LEVEL_TOPIC, mqttClient);
                         break;
                     case "!stop_water_pump":
-                        stopWaterPump();
+                        stopWaterPump(waterLevelSensor.WATER_LEVEL_TOPIC, mqttClient);
                         break;
                     case "!get_presence":
                         getPresence();
@@ -231,7 +231,7 @@ public class PoolControlSystem {
         WaterLevelSensor.upperBound = upperBound;
     }
 
-    private static void startWaterPump(String[] arguments) {
+    private static void startWaterPump(String[] arguments, String WATER_LEVEL_TOPIC, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 1){
             System.out.println("Missing argument in the request");
             return;
@@ -244,14 +244,18 @@ public class PoolControlSystem {
                 return;
             }
             WaterPump.switchWaterPump(arguments[0]);
+            mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage(arguments[0].getBytes(StandardCharsets.UTF_8)));
+
         }
     }
 
-    private static void stopWaterPump() {
+    private static void stopWaterPump(String WATER_LEVEL_TOPIC, MqttClient mqttClient) throws MqttException {
         if(!WaterPump.lastStatus)
             System.out.println("Water pump is already off");
         else
             WaterPump.switchWaterPump("OFF");
+        mqttClient.publish(WATER_LEVEL_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+
     }
 
     private static void setLightColor(String[] arguments) {

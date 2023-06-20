@@ -35,7 +35,6 @@ public class MySqlDbHandler {
     }
 
     public Connection getConnection() throws SQLException {
-        System.out.println(databaseIp + " " + databaseName + " " + databasePort + " " + databasePassword + " " + databaseUsername);
         return DriverManager.getConnection("jdbc:mysql://"+ databaseIp + ":" + databasePort +
                         "/" + databaseName + "?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=CET",
                 databaseUsername, databasePassword);

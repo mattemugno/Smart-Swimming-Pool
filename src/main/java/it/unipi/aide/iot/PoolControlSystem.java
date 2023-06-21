@@ -44,10 +44,10 @@ public class PoolControlSystem {
                 command = bufferedReader.readLine();
                 arguments = command.split(" ");
                 switch(arguments[0]){
-                    case "!get_temperature":
+                    case "!get_temp":
                         getTemperature(TemperatureSensor.getCurrentTemperature());
                         break;
-                    case "!set_temperature":
+                    case "!set_temp":
                         setTemperatureBounds(arguments, mqttClient);
                         break;
                     case "!start_heater":
@@ -114,7 +114,7 @@ public class PoolControlSystem {
         System.out.println("***************************** SMART SWIMMING POOL *****************************\n" +
                 "The following commands are available:\n" +
                 "1) !get_temp --> recovers the last temperature measurement\n" +
-                "2) !set_temp_th <lower bound> <upper bound> --> sets the range within which the temperature must stay in the pool\n" +
+                "2) !set_temp <lower bound> <upper bound> --> sets the range within which the temperature must stay in the pool\n" +
                 "3) !start_heater <mode> --> starts heating system\n" +
                 "4) !stop_heater --> stops heating system\n" +
                 "5) !get_chlorine --> recovers the last chlorine level measurement\n" +
@@ -134,7 +134,7 @@ public class PoolControlSystem {
     }
 
     private static void getTemperature(float currentTemperature) {
-        System.out.println("Current temperature is: " + currentTemperature);
+        System.out.println("Current temperature is: " + currentTemperature + "°C");
     }
 
     private static void setTemperatureBounds(String[] arguments, MqttClient mqttClient) throws MqttException {
@@ -166,11 +166,11 @@ public class PoolControlSystem {
         if (HeatingSystem.isStatus())
             System.out.println("Heating system already active");
         else {
-            if (!Objects.equals(arguments[1], "HOT") & !Objects.equals(arguments[1], "COLD")) {
+            if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
                 System.out.println("Not valid mode");
             }
             HeatingSystem.switchHeatingSystem(arguments[1]);
-            mqttClient.publish("heating-system-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish("temperature-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
             System.out.println("Heating system started in " + arguments[1] + " mode");
         }
 
@@ -181,7 +181,7 @@ public class PoolControlSystem {
             System.out.println("Heating system is already off");
         else {
             HeatingSystem.switchHeatingSystem("OFF");
-            mqttClient.publish("heating-system-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish("temperature-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Heating system switched OFF");
         }
     }

@@ -38,17 +38,11 @@ public class HeatingSystem {
         if(heatingSystemEndpoints.size() == 0)
             return;
 
-        CoapResponse response;
         status = !Objects.equals(mode, "OFF");
         Request req = new Request(CoAP.Code.POST);
         req.getOptions().addUriQuery("mode=" + mode);
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
-            response = heatingSystemEndpoint.advanced(req);
-            if (response != null) {
-                System.out.println("Response: " + response.getResponseText());
-                System.out.println("Payload: " + Arrays.toString(response.getPayload()));
-            } else
-                System.out.println("Request failed");
+            heatingSystemEndpoint.advanced(req);
         }
     }
 

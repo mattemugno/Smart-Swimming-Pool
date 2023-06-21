@@ -43,12 +43,12 @@ public class MySqlDbHandler {
     public void insertTemperatureSample(TemperatureSample temperatureSample) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO temperature (timestamp, node, degrees) VALUES (?, ?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO Temperature (nodeId, degrees, timestamp) VALUES (?, ?, ?)")
         )
         {
-            statement.setTimestamp(1, temperatureSample.getTimestamp());
-            statement.setInt(2, temperatureSample.getNodeId());
-            statement.setFloat(3, temperatureSample.getTemperature());
+            statement.setInt(1, temperatureSample.getNodeId());
+            statement.setInt(2, temperatureSample.getTemperature());
+            statement.setTimestamp(3, temperatureSample.getTimestamp());
             statement.executeUpdate();
         }
         catch (final SQLException e)
@@ -60,7 +60,7 @@ public class MySqlDbHandler {
     public void insertPresenceSample(PresenceSample presenceSample) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO temperature (node, presence) VALUES (?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO Presence (node, presence) VALUES (?, ?)")
         )
         {
             statement.setInt(1, presenceSample.getNodeId());

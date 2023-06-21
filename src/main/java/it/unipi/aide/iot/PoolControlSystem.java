@@ -142,8 +142,8 @@ public class PoolControlSystem {
             System.out.println("Incorrect number of arguments in the request");
             return;
         }
-        float lowerBound = Float.parseFloat(arguments[1]);
-        float upperBound = Float.parseFloat(arguments[2]);
+        int lowerBound = Integer.parseInt(arguments[1]);
+        int upperBound = Integer.parseInt(arguments[2]);
         if(upperBound < lowerBound) {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;

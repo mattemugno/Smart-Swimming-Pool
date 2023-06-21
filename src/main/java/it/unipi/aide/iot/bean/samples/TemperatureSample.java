@@ -4,10 +4,10 @@ import java.sql.Timestamp;
 
 public class TemperatureSample {
     private int nodeId;
-    private float temperature;
+    private int temperature;
     private Timestamp timestamp;
 
-    public TemperatureSample(int idNode, float temperature, Timestamp timestamp) {
+    public TemperatureSample(int idNode, int temperature, Timestamp timestamp) {
         this.nodeId = idNode;
         this.temperature = temperature;
         this.timestamp = timestamp;
@@ -21,11 +21,11 @@ public class TemperatureSample {
         this.nodeId = nodeId;
     }
 
-    public float getTemperature() {
+    public int getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(float temperature) {
+    public void setTemperature(int temperature) {
         this.temperature = temperature;
     }
 

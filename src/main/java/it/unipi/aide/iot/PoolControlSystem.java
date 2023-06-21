@@ -268,7 +268,6 @@ public class PoolControlSystem {
                 System.out.println("Not valid mode");
                 return;
             }
-            System.out.println(arguments[1]);
             WaterPump.switchWaterPump(arguments[1]);
             mqttClient.publish("water-level-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
             System.out.println("Water pump started in " + arguments[1] + " mode");

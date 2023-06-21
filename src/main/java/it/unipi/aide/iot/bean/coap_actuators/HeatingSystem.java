@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public class HeatingSystem {
     private static final List<CoapClient> heatingSystemEndpoints = new ArrayList<>();
-    private static boolean status = false;
+    private static String status = "OFF";
 
     public void registerHeatingSystem(String ip) {
         CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system");
@@ -38,7 +38,13 @@ public class HeatingSystem {
         if(heatingSystemEndpoints.size() == 0)
             return;
 
-        status = !Objects.equals(mode, "OFF");
+        if (Objects.equals(mode, "OFF"))
+            status = "OFF";
+        else if (Objects.equals(mode, "INC"))
+            status = "INC";
+        else if (Objects.equals(mode, "DEC"))
+            status = "DEC";
+
         Request req = new Request(CoAP.Code.POST);
         req.getOptions().addUriQuery("mode=" + mode);
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
@@ -46,7 +52,7 @@ public class HeatingSystem {
         }
     }
 
-    public static boolean isStatus() {
+    public static String isStatus() {
         return status;
     }
 }

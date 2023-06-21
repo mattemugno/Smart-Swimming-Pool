@@ -163,7 +163,7 @@ public class PoolControlSystem {
             System.out.println("Missing argument/s in the request");
             return;
         }
-        if (HeatingSystem.isStatus())
+        if (!Objects.equals(HeatingSystem.isStatus(), "OFF"))
             System.out.println("Heating system already active");
         else {
             if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
@@ -177,7 +177,7 @@ public class PoolControlSystem {
     }
 
     private static void stopHeater(MqttClient mqttClient) throws MqttException {
-        if(!HeatingSystem.isStatus())
+        if(Objects.equals(HeatingSystem.isStatus(), "OFF"))
             System.out.println("Heating system is already off");
         else {
             HeatingSystem.switchHeatingSystem("OFF");
@@ -261,7 +261,7 @@ public class PoolControlSystem {
             System.out.println("Missing argument in the request");
             return;
         }
-        if(WaterPump.lastStatus)
+        if(!Objects.equals(WaterPump.isStatus(), "OFF"))
             System.out.println("Water pump is already active");
         else {
             if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
@@ -276,7 +276,7 @@ public class PoolControlSystem {
     }
 
     private static void stopWaterPump(MqttClient mqttClient) throws MqttException {
-        if(!WaterPump.isStatus())
+        if(Objects.equals(WaterPump.isStatus(), "OFF"))
             System.out.println("Water pump is already off");
         else {
             WaterPump.switchWaterPump("OFF");

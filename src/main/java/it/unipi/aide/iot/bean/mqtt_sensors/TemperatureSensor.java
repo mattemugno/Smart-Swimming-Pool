@@ -16,7 +16,7 @@ public class TemperatureSensor {
     public TemperatureSensor(){
         lastTemperatureSamples = new int[10];
         currentIndex = 0;
-        Arrays.fill(lastTemperatureSamples, 0);
+        Arrays.fill(lastTemperatureSamples, 25);
         lowerBound = 20;
         upperBound = 30;
     }
@@ -28,8 +28,8 @@ public class TemperatureSensor {
     public float getAvgTemperature()
     {
         int howMany = lastTemperatureSamples.length;
-        int sum = 0;
-        for (int sample : lastTemperatureSamples) {
+        float sum = 0;
+        for (float sample : lastTemperatureSamples) {
             if (sample == 0)
                 return 0;
             sum += sample;

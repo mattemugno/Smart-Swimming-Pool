@@ -16,6 +16,7 @@ import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
 import org.eclipse.paho.client.mqttv3.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 
 public class MQTTSubscriber implements MqttCallback {
@@ -66,20 +67,18 @@ public class MQTTSubscriber implements MqttCallback {
             temperatureSensor.saveTemperatureSample(temperatureSample);
             float currentAvgTemperature = temperatureSensor.getAvgTemperature();
 
-            if ((currentAvgTemperature < TemperatureSensor.lowerBound) & (!HeatingSystem.isStatus())) {
+            if ((currentAvgTemperature < TemperatureSensor.lowerBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))) {
                 HeatingSystem.switchHeatingSystem("INC");
                 mqttClient.publish(command_topic, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
             }
 
-            else if ((currentAvgTemperature > TemperatureSensor.upperBound) & (!HeatingSystem.isStatus())) {
+            else if ((currentAvgTemperature > TemperatureSensor.upperBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))) {
                 HeatingSystem.switchHeatingSystem("DEC");
                 mqttClient.publish(command_topic, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
             }
 
-            //else if (currentAvgTemperature == 0)
-                //System.out.println("Not enough samples collected");
-
-            else if((HeatingSystem.isStatus()) & (currentAvgTemperature <= TemperatureSensor.lowerBound || currentAvgTemperature >= TemperatureSensor.upperBound)) {
+            else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature >= TemperatureSensor.upperBound)) ||
+                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature <= TemperatureSensor.lowerBound))){
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }
@@ -90,10 +89,10 @@ public class MQTTSubscriber implements MqttCallback {
             waterLevelSensor.saveWaterLevelSample(waterLevelSample);
             int currentWaterLevel = WaterLevelSensor.getCurrentWaterLevel();
 
-            if ((currentWaterLevel < WaterLevelSensor.lowerBound) & (!WaterPump.isStatus()))
+            if ((currentWaterLevel < WaterLevelSensor.lowerBound) & (Objects.equals(WaterPump.isStatus(), "OFF")))
                 sampleUnderWaterTh += 1;
 
-            else if ((currentWaterLevel > WaterLevelSensor.upperBound) & (!WaterPump.isStatus()))
+            else if ((currentWaterLevel > WaterLevelSensor.upperBound) & (Objects.equals(WaterPump.isStatus(), "OFF")))
                 sampleOverWaterTh += 1;
 
             else {
@@ -111,7 +110,8 @@ public class MQTTSubscriber implements MqttCallback {
                 WaterPump.switchWaterPump("DEC");
                 mqttClient.publish(water_lev_command, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
             }
-            else if (WaterPump.isStatus() & (currentWaterLevel <= WaterLevelSensor.lowerBound || currentWaterLevel >= WaterLevelSensor.upperBound)){
+            else if(((Objects.equals(WaterPump.isStatus(), "INC")) & (currentWaterLevel >= WaterLevelSensor.upperBound)) ||
+                    ((Objects.equals(WaterPump.isStatus(), "DEC")) & (currentWaterLevel <= WaterLevelSensor.lowerBound))){
                 System.out.println("Switch off water pump");
                 WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(water_lev_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));

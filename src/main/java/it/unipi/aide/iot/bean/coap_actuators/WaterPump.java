@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class WaterPump {
     public static boolean lastStatus;
-    private static boolean status = false;
+    private static String status = "OFF";
     private static final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
 
     public void registerWaterPump(String ip) {
@@ -40,21 +40,20 @@ public class WaterPump {
         if(waterPumpEndpoints.size() == 0)
             return;
 
-        //CoapResponse response;
-        status = !Objects.equals(mode, "OFF");
+        if (Objects.equals(mode, "OFF"))
+            status = "OFF";
+        else if (Objects.equals(mode, "INC"))
+            status = "INC";
+        else if (Objects.equals(mode, "DEC"))
+            status = "DEC";
+
         Request req = new Request(CoAP.Code.POST);
         req.getOptions().addUriQuery("mode=" + mode);
-        for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
+        for(CoapClient waterPumpEndpoint: waterPumpEndpoints)
             waterPumpEndpoint.advanced(req);
-            /*if (response != null) {
-                System.out.println("Response: " + response.getResponseText());
-                System.out.println("Payload: " + Arrays.toString(response.getPayload()));
-            } else
-                System.out.println("Request failed");*/
-        }
     }
 
-    public static boolean isStatus() {
+    public static String isStatus() {
         return status;
     }
 }

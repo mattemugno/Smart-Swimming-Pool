@@ -26,15 +26,11 @@ import java.util.Objects;
 
 public class PoolControlSystem {
     public static void main(String[] args) throws SQLException, MqttException {
-        PresenceSensor presenceSensor = new PresenceSensor();
-        ChlorineSensor chlorineSensor = new ChlorineSensor();
-        WaterLevelSensor waterLevelSensor = new WaterLevelSensor();
-        TemperatureSensor temperatureSensor = new TemperatureSensor();
         CoapRegistrationServer coapRegistrationServer = new CoapRegistrationServer();
         coapRegistrationServer.start();
         MQTTSubscriber mqttSubscriber = new MQTTSubscriber();
         MySqlDbHandler mySqlDbHandler = MySqlDbHandler.getInstance();
-        Connection connection = mySqlDbHandler.getConnection();
+        mySqlDbHandler.getConnection();
         MqttClient mqttClient = mqttSubscriber.getMqttClient();
 
         printCommands();
@@ -52,25 +48,25 @@ public class PoolControlSystem {
                         getTemperature(TemperatureSensor.getCurrentTemperature());
                         break;
                     case "!set_temperature":
-                        setTemperatureBounds(arguments);
+                        setTemperatureBounds(arguments, mqttClient);
                         break;
                     case "!start_heater":
-                        startHeater(arguments);
+                        startHeater(arguments, mqttClient);
                         break;
                     case "!stop_heater":
-                        stopHeater();
+                        stopHeater(mqttClient);
                         break;
                     case "!get_chlorine":
                         getChlorine(ChlorineSensor.getLastChlorineLevel());
                         break;
                     case "!set_chlorine":
-                        setChlorine(arguments);
+                        setChlorine(arguments, mqttClient);
                         break;
                     case "!start_chlorine":
-                        startChlorineDispenser();
+                        startChlorineDispenser(mqttClient);
                         break;
                     case "!stop_chlorine":
-                        stopChlorineDispenser();
+                        stopChlorineDispenser(mqttClient);
                         break;
                     case "!get_water_level":
                         getWaterLevel(WaterLevelSensor.getCurrentWaterLevel());
@@ -141,7 +137,7 @@ public class PoolControlSystem {
         System.out.println("Current temperature is: " + currentTemperature);
     }
 
-    private static void setTemperatureBounds(String[] arguments) {
+    private static void setTemperatureBounds(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 3){
             System.out.println("Incorrect number of arguments in the request");
             return;
@@ -152,57 +148,87 @@ public class PoolControlSystem {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
         }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("min", lowerBound);
+        jsonObject.put("max", upperBound);
+
+        String payload = jsonObject.toString();
+        mqttClient.publish("heating-system-command", new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         TemperatureSensor.lowerBound = lowerBound;
         TemperatureSensor.upperBound = upperBound;
     }
 
-    private static void startHeater(String[] arguments) {
+    private static void startHeater(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 2){
             System.out.println("Missing argument/s in the request");
             return;
         }
-        if(!Objects.equals(arguments[1], "HOT") & !Objects.equals(arguments[1], "COLD")){
-            System.out.println("Not valid mode");
+        if (HeatingSystem.isStatus())
+            System.out.println("Heating system already active");
+        else {
+            if (!Objects.equals(arguments[1], "HOT") & !Objects.equals(arguments[1], "COLD")) {
+                System.out.println("Not valid mode");
+            }
+            HeatingSystem.switchHeatingSystem(arguments[1]);
+            mqttClient.publish("heating-system-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Heating system started in " + arguments[1] + " mode");
         }
-        HeatingSystem.switchHeatingSystem(arguments[1]);
 
     }
 
-    private static void stopHeater() {
-        HeatingSystem.switchHeatingSystem("OFF");
+    private static void stopHeater(MqttClient mqttClient) throws MqttException {
+        if(!HeatingSystem.isStatus())
+            System.out.println("Heating system is already off");
+        else {
+            HeatingSystem.switchHeatingSystem("OFF");
+            mqttClient.publish("heating-system-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Heating system switched OFF");
+        }
     }
 
     private static void getChlorine(float lastChlorineLevel) {
         System.out.println("Current chlorine level is: " + lastChlorineLevel);
     }
 
-    private static void setChlorine(String[] arguments) {
+    private static void setChlorine(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 3){
             System.out.println("Missing argument in the request");
             return;
         }
-        float lowerBound = Float.parseFloat(arguments[1]);
-        float upperBound = Float.parseFloat(arguments[2]);
+        int lowerBound = Integer.parseInt(arguments[1]);
+        int upperBound = Integer.parseInt(arguments[2]);
         if(upperBound < lowerBound) {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
         }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("min", lowerBound);
+        jsonObject.put("max", upperBound);
+
+        String payload = jsonObject.toString();
+        mqttClient.publish("chlorine-dispenser-command", new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         ChlorineSensor.lowerBound = lowerBound;
         ChlorineSensor.upperBound = upperBound;
     }
 
-    private static void startChlorineDispenser() {
+    private static void startChlorineDispenser(MqttClient mqttClient) throws MqttException {
         if(ChlorineDispenser.lastStatus)
             System.out.println("Chlorine dispenser is already active");
-        else
+        else {
             ChlorineDispenser.switchChlorineDispenser();
+            mqttClient.publish("chlorine-dispenser-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Chlorine dispenser started");
+        }
     }
 
-    private static void stopChlorineDispenser() {
+    private static void stopChlorineDispenser(MqttClient mqttClient) throws MqttException {
         if(!ChlorineDispenser.lastStatus)
             System.out.println("Chlorine dispenser is already off");
-        else
+        else {
             ChlorineDispenser.switchChlorineDispenser();
+            mqttClient.publish("chlorine-dispenser-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Chlorine dispenser switched OFF");
+        }
     }
 
     private static void getWaterLevel(int currentWaterLevel) {

@@ -4,10 +4,14 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
+import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ChlorineDispenser {
 
@@ -44,21 +48,16 @@ public class ChlorineDispenser {
             lastStatus = true;
         }
 
+        CoapResponse response;
+        Request req = new Request(CoAP.Code.POST);
+        req.getOptions().addUriQuery("mode=" + msg);
         for(CoapClient chlorineDispenserEndpoint: chlorineDispenserEndpoints) {
-            chlorineDispenserEndpoint.put(new CoapHandler() {
-                @Override
-                public void onLoad(CoapResponse coapResponse) {
-                    if (coapResponse != null) {
-                        if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Chlorine dispenser switching: PUT request unsuccessful");
-                    }
-                }
-
-                @Override
-                public void onError() {
-                    System.err.print("[ERROR] Chlorine dispenser switching " + chlorineDispenserEndpoint.getURI() + "]");
-                }
-            }, msg, MediaTypeRegistry.TEXT_PLAIN);
+            response = chlorineDispenserEndpoint.advanced(req);
+            if (response != null) {
+                System.out.println("Response: " + response.getResponseText());
+                System.out.println("Payload: " + Arrays.toString(response.getPayload()));
+            } else
+                System.out.println("Request failed");
         }
     }
 }

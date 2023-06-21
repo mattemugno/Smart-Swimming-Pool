@@ -1,6 +1,7 @@
 package it.unipi.aide.iot.mqtt;
 
 import com.google.gson.Gson;
+import it.unipi.aide.iot.bean.coap_actuators.ChlorineDispenser;
 import it.unipi.aide.iot.bean.coap_actuators.HeatingSystem;
 import it.unipi.aide.iot.bean.coap_actuators.Light;
 import it.unipi.aide.iot.bean.coap_actuators.WaterPump;
@@ -20,8 +21,9 @@ import java.nio.charset.StandardCharsets;
 public class MQTTSubscriber implements MqttCallback {
     public String BROKER = "tcp://127.0.0.1:1883";
     public String CLIENT_ID = "RemoteControlApp";
-    public static int a = 0;
-    public static int b = 0;
+    public static int sampleUnderWaterTh = 0;
+    public static int sampleOverWaterTh = 0;
+    public static int sampleOutChlorineRange = 0;
 
     private MqttClient mqttClient = null;
     private final PresenceSensor presenceSensor;
@@ -88,22 +90,22 @@ public class MQTTSubscriber implements MqttCallback {
             int currentWaterLevel = WaterLevelSensor.getCurrentWaterLevel();
 
             if (currentWaterLevel < WaterLevelSensor.lowerBound)
-                a += 1;
+                sampleUnderWaterTh += 1;
 
             else if (currentWaterLevel > WaterLevelSensor.upperBound)
-                b += 1;
+                sampleOverWaterTh += 1;
 
             else {
-                a = 0;
-                b = 0;
+                sampleUnderWaterTh = 0;
+                sampleOverWaterTh = 0;
             }
 
-            if (a == 3){
+            if (sampleUnderWaterTh == 3){
                 System.out.println("Accendi in modalita INC");
                 WaterPump.switchWaterPump("INC");
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
             }
-            else if (b == 3){
+            else if (sampleOverWaterTh == 3){
                 System.out.println("Accendi in modalita DEC");
                 WaterPump.switchWaterPump("DEC");
                 mqttClient.publish(waterLevelSensor.WATER_LEVEL_TOPIC, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
@@ -118,6 +120,28 @@ public class MQTTSubscriber implements MqttCallback {
         else if(topic.equals(chlorineSensor.CHLORINE_TOPIC)){
             ChlorineSample chlorineSample = parser.fromJson(payload, ChlorineSample.class);
             chlorineSensor.saveChlorineSample(chlorineSample);
+            int currentChlorineLevel = ChlorineSensor.getLastChlorineLevel();
+
+            if (currentChlorineLevel < ChlorineSensor.lowerBound)
+                 sampleOutChlorineRange += 1;
+
+            else if (currentChlorineLevel > ChlorineSensor.upperBound)
+                sampleOutChlorineRange += 1;
+
+            else
+                sampleOutChlorineRange = 0;
+
+            if (sampleOutChlorineRange == 3){
+                System.out.println("Accendi dispenser");
+                ChlorineDispenser.switchChlorineDispenser();
+                mqttClient.publish(chlorineSensor.CHLORINE_TOPIC, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+            }
+
+            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= ChlorineSensor.lowerBound & currentChlorineLevel <= ChlorineSensor.upperBound){
+                System.out.println("Spegni dispenser");
+                ChlorineDispenser.switchChlorineDispenser();
+                mqttClient.publish(chlorineSensor.CHLORINE_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            }
         }
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);

@@ -4,13 +4,13 @@ import java.sql.Timestamp;
 
 public class ChlorineSample {
     private int nodeId;
-    private float chlorineLevel;
+    private int chlorineLevel;
     private Timestamp timestamp;
 
-    public ChlorineSample(int nodeId, float chlorineLevel, Timestamp timestamp) {
+    public ChlorineSample(int nodeId, int chlorineLevel) {
         this.nodeId = nodeId;
         this.chlorineLevel = chlorineLevel;
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
     public int getNodeId() {
@@ -21,20 +21,16 @@ public class ChlorineSample {
         this.nodeId = nodeId;
     }
 
-    public float getChlorineLevel() {
+    public int getChlorineLevel() {
         return chlorineLevel;
     }
 
-    public void setChlorineLevel(float chlorineLevel) {
+    public void setChlorineLevel(int chlorineLevel) {
         this.chlorineLevel = chlorineLevel;
     }
 
     public Timestamp getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
     }
 
     @Override

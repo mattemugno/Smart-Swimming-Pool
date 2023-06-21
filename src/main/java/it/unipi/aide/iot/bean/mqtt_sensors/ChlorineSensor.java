@@ -5,9 +5,9 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 
 public class ChlorineSensor {
     public final String CHLORINE_TOPIC = "chlorine";
-    public static float lastChlorineLevel;
-    public static float lowerBound;
-    public static float upperBound;
+    public static int lastChlorineLevel;
+    public static int lowerBound;
+    public static int upperBound;
 
     public void saveChlorineSample(ChlorineSample chlorineSample){
         //method to store in db the last sample read from broker
@@ -16,7 +16,7 @@ public class ChlorineSensor {
 
     }
 
-    public static float getLastChlorineLevel(){
+    public static int getLastChlorineLevel(){
         return lastChlorineLevel;
     }
 }

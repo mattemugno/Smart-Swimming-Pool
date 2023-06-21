@@ -4,9 +4,12 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
+import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,29 +37,18 @@ public class HeatingSystem {
     public static void switchHeatingSystem(String mode){
         if(heatingSystemEndpoints.size() == 0)
             return;
-        if (!Objects.equals(mode, "OFF"))
-            status = true;
-        else
-            status = false;
 
-        String msg = "mode=" + mode;
-
-        //li accendo tutti insieme, quindi mando un coap message per ogni heating system registrato
+        CoapResponse response;
+        status = !Objects.equals(mode, "OFF");
+        Request req = new Request(CoAP.Code.POST);
+        req.getOptions().addUriQuery("mode=" + mode);
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
-            heatingSystemEndpoint.put(new CoapHandler() {
-                @Override
-                public void onLoad(CoapResponse coapResponse) {
-                    if (coapResponse != null) {
-                        if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR] Heater Switching: PUT request unsuccessful");
-                    }
-                }
-
-                @Override
-                public void onError() {
-                    System.err.print("[ERROR] Heater Switching " + heatingSystemEndpoint.getURI() + "]");
-                }
-            }, msg, MediaTypeRegistry.TEXT_PLAIN);
+            response = heatingSystemEndpoint.advanced(req);
+            if (response != null) {
+                System.out.println("Response: " + response.getResponseText());
+                System.out.println("Payload: " + Arrays.toString(response.getPayload()));
+            } else
+                System.out.println("Request failed");
         }
     }
 

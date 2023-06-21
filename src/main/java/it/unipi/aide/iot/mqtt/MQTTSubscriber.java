@@ -14,7 +14,6 @@ import it.unipi.aide.iot.bean.mqtt_sensors.PresenceSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.TemperatureSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
 import org.eclipse.paho.client.mqttv3.*;
-import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
@@ -91,10 +90,10 @@ public class MQTTSubscriber implements MqttCallback {
             waterLevelSensor.saveWaterLevelSample(waterLevelSample);
             int currentWaterLevel = WaterLevelSensor.getCurrentWaterLevel();
 
-            if (currentWaterLevel < WaterLevelSensor.lowerBound)
+            if ((currentWaterLevel < WaterLevelSensor.lowerBound) & (!WaterPump.isStatus()))
                 sampleUnderWaterTh += 1;
 
-            else if (currentWaterLevel > WaterLevelSensor.upperBound)
+            else if ((currentWaterLevel > WaterLevelSensor.upperBound) & (!WaterPump.isStatus()))
                 sampleOverWaterTh += 1;
 
             else {
@@ -112,7 +111,7 @@ public class MQTTSubscriber implements MqttCallback {
                 WaterPump.switchWaterPump("DEC");
                 mqttClient.publish(water_lev_command, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
             }
-            else if (WaterPump.isStatus() & (currentWaterLevel >= WaterLevelSensor.lowerBound & currentWaterLevel <= WaterLevelSensor.upperBound)){
+            else if (WaterPump.isStatus() & (currentWaterLevel <= WaterLevelSensor.lowerBound || currentWaterLevel >= WaterLevelSensor.upperBound)){
                 System.out.println("Switch off water pump");
                 WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(water_lev_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
@@ -198,7 +197,6 @@ public class MQTTSubscriber implements MqttCallback {
     }
 
     private void brokerConnection () throws MqttException {
-        System.out.println("entrato");
         mqttClient.connect();
         mqttClient.subscribe(presenceSensor.PRESENCE_TOPIC);
         System.out.println("Subscribed to: " + presenceSensor.PRESENCE_TOPIC);

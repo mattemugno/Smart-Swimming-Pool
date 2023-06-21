@@ -40,17 +40,17 @@ public class WaterPump {
         if(waterPumpEndpoints.size() == 0)
             return;
 
-        CoapResponse response;
+        //CoapResponse response;
         status = !Objects.equals(mode, "OFF");
         Request req = new Request(CoAP.Code.POST);
         req.getOptions().addUriQuery("mode=" + mode);
         for(CoapClient waterPumpEndpoint: waterPumpEndpoints) {
-            response = waterPumpEndpoint.advanced(req);
-            if (response != null) {
+            waterPumpEndpoint.advanced(req);
+            /*if (response != null) {
                 System.out.println("Response: " + response.getResponseText());
                 System.out.println("Payload: " + Arrays.toString(response.getPayload()));
             } else
-                System.out.println("Request failed");
+                System.out.println("Request failed");*/
         }
     }
 

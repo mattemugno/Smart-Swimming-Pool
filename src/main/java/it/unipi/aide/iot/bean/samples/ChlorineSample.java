@@ -5,12 +5,10 @@ import java.sql.Timestamp;
 public class ChlorineSample {
     private int nodeId;
     private int chlorineLevel;
-    private Timestamp timestamp;
 
     public ChlorineSample(int nodeId, int chlorineLevel) {
         this.nodeId = nodeId;
         this.chlorineLevel = chlorineLevel;
-        this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
     public int getNodeId() {
@@ -29,16 +27,11 @@ public class ChlorineSample {
         this.chlorineLevel = chlorineLevel;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
     @Override
     public String toString() {
         return "ChlorineSample{" +
                 "nodeId=" + nodeId +
                 ", chlorineLevel=" + chlorineLevel +
-                ", timestamp=" + timestamp +
                 '}';
     }
 }

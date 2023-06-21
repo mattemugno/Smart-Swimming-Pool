@@ -41,7 +41,6 @@ public class TemperatureSensor {
         lastTemperatureSamples[currentIndex] = temperatureSample.getTemperature();
         currentIndex = (currentIndex + 1) % lastTemperatureSamples.length;
 
-        temperatureSample.setTimestamp(new Timestamp(System.currentTimeMillis()));
         MySqlDbHandler.getInstance().insertTemperatureSample(temperatureSample);
     }
 

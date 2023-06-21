@@ -5,12 +5,10 @@ import java.sql.Timestamp;
 public class TemperatureSample {
     private int nodeId;
     private int temperature;
-    private Timestamp timestamp;
 
-    public TemperatureSample(int idNode, int temperature, Timestamp timestamp) {
+    public TemperatureSample(int idNode, int temperature) {
         this.nodeId = idNode;
         this.temperature = temperature;
-        this.timestamp = timestamp;
     }
 
     public int getNodeId() {
@@ -29,20 +27,11 @@ public class TemperatureSample {
         this.temperature = temperature;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
-    }
-
     @Override
     public String toString() {
         return "TemperatureSample{" +
                 "idNode=" + nodeId +
                 ", temperature=" + temperature +
-                ", timestamp=" + timestamp +
                 '}';
     }
 }

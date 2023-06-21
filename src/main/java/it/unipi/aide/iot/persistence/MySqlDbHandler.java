@@ -96,7 +96,7 @@ public class MySqlDbHandler {
                 PreparedStatement statement = connection.prepareStatement("INSERT INTO Chlorine (timestamp, node, chlorine_level) VALUES (?, ?, ?)")
         )
         {
-            statement.setTimestamp(1, chlorineSample.getTimestamp());
+            statement.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
             statement.setInt(2, chlorineSample.getNodeId());
             statement.setFloat(3, chlorineSample.getChlorineLevel());
             statement.executeUpdate();

@@ -66,12 +66,12 @@ public class MQTTSubscriber implements MqttCallback {
             temperatureSensor.saveTemperatureSample(temperatureSample);
             float currentAvgTemperature = temperatureSensor.getAvgTemperature();
 
-            if (currentAvgTemperature !=0 & currentAvgTemperature < TemperatureSensor.lowerBound) {
+            if ((currentAvgTemperature < TemperatureSensor.lowerBound) & (!HeatingSystem.isStatus())) {
                 HeatingSystem.switchHeatingSystem("INC");
                 mqttClient.publish(command_topic, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
             }
 
-            else if (currentAvgTemperature !=0 & currentAvgTemperature > TemperatureSensor.upperBound) {
+            else if ((currentAvgTemperature > TemperatureSensor.upperBound) & (!HeatingSystem.isStatus())) {
                 HeatingSystem.switchHeatingSystem("DEC");
                 mqttClient.publish(command_topic, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
             }
@@ -79,7 +79,7 @@ public class MQTTSubscriber implements MqttCallback {
             //else if (currentAvgTemperature == 0)
                 //System.out.println("Not enough samples collected");
 
-            else if((HeatingSystem.isStatus()) & (currentAvgTemperature >= TemperatureSensor.lowerBound & currentAvgTemperature <= TemperatureSensor.upperBound)) {
+            else if((HeatingSystem.isStatus()) & (currentAvgTemperature <= TemperatureSensor.lowerBound || currentAvgTemperature >= TemperatureSensor.upperBound)) {
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }

@@ -48,7 +48,7 @@ public class MySqlDbHandler {
         {
             statement.setInt(1, temperatureSample.getNodeId());
             statement.setInt(2, temperatureSample.getTemperature());
-            statement.setTimestamp(3, temperatureSample.getTimestamp());
+            statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
         }
         catch (final SQLException e)
@@ -81,7 +81,7 @@ public class MySqlDbHandler {
         {
             statement.setInt(1, waterLevelSample.getNodeId());
             statement.setFloat(2, waterLevelSample.getHeight());
-            statement.setTimestamp(3, waterLevelSample.getTimestamp());
+            statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
         }
         catch (final SQLException e)
@@ -93,7 +93,7 @@ public class MySqlDbHandler {
     public void insertChlorineSample(ChlorineSample chlorineSample) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO temperature (timestamp, node, chlorine_level) VALUES (?, ?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO Chlorine (timestamp, node, chlorine_level) VALUES (?, ?, ?)")
         )
         {
             statement.setTimestamp(1, chlorineSample.getTimestamp());

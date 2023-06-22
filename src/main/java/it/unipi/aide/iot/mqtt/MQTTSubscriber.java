@@ -150,17 +150,18 @@ public class MQTTSubscriber implements MqttCallback {
             }
         }
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
+            String presence_command = "light-command";
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
             presenceSensor.savePresenceSample(presenceSample);
             if((presenceSample.isPresence()) & (!Light.isLastStatus())) {
                 Light.lightSwitch(true);
-                mqttClient.publish(presenceSensor.PRESENCE_TOPIC, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
-                System.out.println("Light switched on");
+                mqttClient.publish(presence_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+                logger.logPresence("Light switched ON");
             }
             else if((!presenceSample.isPresence()) & (Light.isLastStatus())) {
                 Light.lightSwitch(false);
-                mqttClient.publish(presenceSensor.PRESENCE_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
-                System.out.println("Light switched off");
+                mqttClient.publish(presence_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+                logger.logPresence("Light switched OFF");
             }
         }
         else{
@@ -204,12 +205,16 @@ public class MQTTSubscriber implements MqttCallback {
     private void brokerConnection () throws MqttException {
         mqttClient.connect();
         mqttClient.subscribe(presenceSensor.PRESENCE_TOPIC);
-        System.out.println("Subscribed to: " + presenceSensor.PRESENCE_TOPIC);
+        //System.out.println("Subscribed to: " + presenceSensor.PRESENCE_TOPIC);
+        logger.logInfo("Subscribed to: " + presenceSensor.PRESENCE_TOPIC);
         mqttClient.subscribe(temperatureSensor.TEMPERATURE_TOPIC);
-        System.out.println("Subscribed to: " + temperatureSensor.TEMPERATURE_TOPIC);
+        //System.out.println("Subscribed to: " + temperatureSensor.TEMPERATURE_TOPIC);
+        logger.logInfo("Subscribed to: " + temperatureSensor.TEMPERATURE_TOPIC);
         mqttClient.subscribe(chlorineSensor.CHLORINE_TOPIC);
-        System.out.println("Subscribed to: " + chlorineSensor.CHLORINE_TOPIC);
+        //System.out.println("Subscribed to: " + chlorineSensor.CHLORINE_TOPIC);
+        logger.logInfo("Subscribed to: " + chlorineSensor.CHLORINE_TOPIC);
         mqttClient.subscribe(waterLevelSensor.WATER_LEVEL_TOPIC);
-        System.out.println("Subscribed to: " + waterLevelSensor.WATER_LEVEL_TOPIC);
+        //System.out.println("Subscribed to: " + waterLevelSensor.WATER_LEVEL_TOPIC);
+        logger.logInfo("Subscribed to: " + waterLevelSensor.WATER_LEVEL_TOPIC);
     }
 }

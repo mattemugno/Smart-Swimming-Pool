@@ -87,10 +87,10 @@ public class PoolControlSystem {
                         setLightColor(arguments);
                         break;
                     case "!start_light":
-                        startLight();
+                        startLight(mqttClient);
                         break;
                     case "!stop_light":
-                        stopLight();
+                        stopLight(mqttClient);
                         break;
                     case "!exit":
                         MySqlDbHandler.getInstance().removeAllDevices();
@@ -273,7 +273,7 @@ public class PoolControlSystem {
             System.out.println("Missing argument/s in the request");
             return;
         }
-        if(!Objects.equals(arguments[1], "RED") & !Objects.equals(arguments[1], "GREEN") & !Objects.equals(arguments[1], "YELLOW"))
+        if(!Objects.equals(arguments[1], "r") & !Objects.equals(arguments[1], "g") & !Objects.equals(arguments[1], "y"))
             System.out.println("Color not available");
         else
             Light.setLightColor(arguments[1]);
@@ -286,18 +286,22 @@ public class PoolControlSystem {
             System.out.println("Swimming pool is empty");
     }
 
-    private static void stopLight() {
+    private static void stopLight(MqttClient mqttClient) throws MqttException {
         if(!Light.lastStatus)
             System.out.println("Light is already off");
-        else
+        else {
             Light.lightSwitch(false);
+            mqttClient.publish("light-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+        }
     }
 
-    private static void startLight() {
+    private static void startLight(MqttClient mqttClient) throws MqttException {
         if(Light.lastStatus)
             System.out.println("Light is already on");
-        else
+        else {
             Light.lightSwitch(true);
+            mqttClient.publish("light-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+        }
     }
 
 }

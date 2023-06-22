@@ -3,7 +3,9 @@ import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
+import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,10 @@ public class Light {
     private static final List<CoapClient> clientLightStatusList = new ArrayList<>();
     private static final List<CoapClient> clientLightColorList = new ArrayList<>();
     public static boolean lastStatus;
+    public static String currentColor;
 
     public void registerLight(String ip) {
-        CoapClient newClientLightStatus = new CoapClient("coap://[" + ip + "]/light/status");
+        CoapClient newClientLightStatus = new CoapClient("coap://[" + ip + "]/light/switch");
         CoapClient newClientLightColor = new CoapClient("coap://[" + ip + "]/light/color");
 
         clientLightStatusList.add(newClientLightStatus);
@@ -39,50 +42,44 @@ public class Light {
         if(clientLightStatusList.size() == 0)
             return;
 
-        String msg = "status=" + (status ? "ON" : "OFF");
+        String msg = "mode=" + (status ? "ON" : "OFF");
         lastStatus = status;
-        for(CoapClient clientLightStatus: clientLightStatusList) {
-            //con la put invio all'endpoint di ogni luce il testo desiderato (faccio la put sulla risorsa definita su cooja)
-            clientLightStatus.put(new CoapHandler() {
-                @Override
-                public void onLoad(CoapResponse coapResponse) {
-                    if (coapResponse != null) {
-                        if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Light Switch: PUT request unsuccessful");
-                    }
-                }
-
-                @Override
-                public void onError() {
-                    System.err.print("[ERROR] Light Switch " + clientLightStatus.getURI() + "]");
-                }
-            }, msg, MediaTypeRegistry.TEXT_PLAIN);
-        }
+        Request req = new Request(CoAP.Code.POST);
+        req.getOptions().addUriQuery(msg);
+        for(CoapClient clientLightEndpoint: clientLightStatusList)
+            clientLightEndpoint.advanced(req);
     }
 
     public static void setLightColor(String color) {
         if(clientLightColorList.size() == 0)
             return;
 
-        if(!Objects.equals(color, "red") & !Objects.equals(color, "green") & !Objects.equals(color, "yellow")) {
-            System.out.println("Color not available, try with red, green or yellow");
+        if(!Objects.equals(color, "r") & !Objects.equals(color, "g") & !Objects.equals(color, "y")) {
+            System.out.println("Color not available, try with red(r), green(g) or yellow(y)");
             return;
         }
-        String msg = "color=" + color;
-        for(CoapClient clientLightColor: clientLightColorList) {
-            clientLightColor.put(new CoapHandler() {
-                @Override
-                public void onLoad(CoapResponse coapResponse) {
-                    if (!coapResponse.isSuccess())
-                        System.out.print("[ERROR] Light Color: PUT request unsuccessful");
-                }
 
-                @Override
-                public void onError() {
-                    System.err.print("[ERROR] Light Color " + clientLightColor.getURI() + "]");
-                }
-            }, msg, MediaTypeRegistry.TEXT_PLAIN);
+        switch (color) {
+            case "y":
+                currentColor = "y";
+                break;
+            case "r":
+                currentColor = "r";
+                break;
+            case "g":
+                currentColor = "g";
+                break;
         }
+
+        String msg = "color=" + color;
+        Request req = new Request(CoAP.Code.POST);
+        req.getOptions().addUriQuery(msg);
+        for(CoapClient clientLightColor: clientLightColorList)
+            clientLightColor.advanced(req);
+    }
+
+    public static String currentColor(){
+        return currentColor;
     }
 
     public static boolean isLastStatus() {

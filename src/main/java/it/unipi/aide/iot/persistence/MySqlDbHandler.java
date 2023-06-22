@@ -60,11 +60,12 @@ public class MySqlDbHandler {
     public void insertPresenceSample(PresenceSample presenceSample) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO Presence (node, presence) VALUES (?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO Presence (nodeId, presence, timestamp) VALUES (?, ?)")
         )
         {
             statement.setInt(1, presenceSample.getNodeId());
             statement.setBoolean(2, presenceSample.isPresence());
+            statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
         }
         catch (final SQLException e)

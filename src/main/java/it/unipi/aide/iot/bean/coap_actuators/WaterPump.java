@@ -1,6 +1,7 @@
 package it.unipi.aide.iot.bean.coap_actuators;
 
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
+import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
@@ -18,12 +19,14 @@ public class WaterPump {
     public static boolean lastStatus;
     private static String status = "OFF";
     private static final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
+    private Logger logger;
 
     public void registerWaterPump(String ip) {
         CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water-pump/switch");
         waterPumpEndpoints.add(waterPumpEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "water-pump");
-        System.out.print("[REGISTRATION] The water pump: [" + ip + "] is now registered\n");
+        //System.out.print("[REGISTRATION] The water pump: [" + ip + "] is now registered\n");
+        logger.logInfo("The water pump: [\" + ip + \"] is now registered");
     }
 
     public void unregisterWaterPump(String ip) {

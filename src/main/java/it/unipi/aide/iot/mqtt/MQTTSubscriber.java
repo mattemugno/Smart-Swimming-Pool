@@ -143,7 +143,7 @@ public class MQTTSubscriber implements MqttCallback {
 
             }
 
-            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= ChlorineSensor.upperBound - 1){
+            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= (ChlorineSensor.upperBound - ChlorineSensor.lowerBound)/2){
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logChlorine("Switched OFF");

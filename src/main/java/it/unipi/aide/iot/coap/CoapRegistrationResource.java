@@ -31,7 +31,7 @@ public class CoapRegistrationResource extends CoapResource {
     @Override
     public void handlePOST(CoapExchange exchange) {
         String deviceType = exchange.getRequestText();
-        System.out.println("Device type: " + deviceType);
+        //System.out.println("Device type: " + deviceType);
         String ip = exchange.getSourceAddress().getHostAddress();
         boolean success = true;
 

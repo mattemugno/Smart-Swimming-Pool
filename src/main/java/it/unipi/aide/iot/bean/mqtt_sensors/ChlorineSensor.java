@@ -9,6 +9,11 @@ public class ChlorineSensor {
     public static int lowerBound;
     public static int upperBound;
 
+    public ChlorineSensor(){
+        lowerBound = 40;
+        upperBound = 80;
+    }
+
     public void saveChlorineSample(ChlorineSample chlorineSample){
         //method to store in db the last sample read from broker
         lastChlorineLevel = chlorineSample.getChlorine();

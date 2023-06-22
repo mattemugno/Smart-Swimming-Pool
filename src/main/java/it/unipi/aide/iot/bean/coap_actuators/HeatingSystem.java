@@ -1,6 +1,7 @@
 package it.unipi.aide.iot.bean.coap_actuators;
 
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
+import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
@@ -16,12 +17,14 @@ import java.util.Objects;
 public class HeatingSystem {
     private static final List<CoapClient> heatingSystemEndpoints = new ArrayList<>();
     private static String status = "OFF";
+    private Logger logger;
 
     public void registerHeatingSystem(String ip) {
         CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system");
         heatingSystemEndpoints.add(heatingSystemEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "heating_system");
-        System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered\n");
+        //System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered\n");
+        logger.logInfo("The heating system: [\" + ip + \"] is now registered");
     }
 
     public void unregisterHeatingSystem(String ip) {

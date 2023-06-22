@@ -1,6 +1,7 @@
 package it.unipi.aide.iot.bean.coap_actuators;
 
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
+import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
@@ -17,12 +18,15 @@ public class ChlorineDispenser {
 
     public static final List<CoapClient> chlorineDispenserEndpoints = new ArrayList<>();
     public static boolean lastStatus;
+    private Logger logger;
 
     public void registerChlorineDispenser(String ip) {
         CoapClient chlorineDispenserEndpoint = new CoapClient("coap://[" + ip + "]/chlorine_dispenser");
         chlorineDispenserEndpoints.add(chlorineDispenserEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "chlorine_dispenser");
-        System.out.print("[REGISTRATION] The chlorine dispenser: [" + ip + "] is now registered\n");
+        //System.out.print("[REGISTRATION] The chlorine dispenser: [" + ip + "] is now registered\n");
+        logger.logInfo("The chlorine dispenser: [\" + ip + \"] is now registered");
+
     }
 
     public void unregisterChlorineDispenser(String ip) {

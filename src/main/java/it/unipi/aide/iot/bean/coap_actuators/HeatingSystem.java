@@ -17,7 +17,7 @@ import java.util.Objects;
 public class HeatingSystem {
     private static final List<CoapClient> heatingSystemEndpoints = new ArrayList<>();
     private static String status = "OFF";
-    private Logger logger;
+    private Logger logger = Logger.getInstance();
 
     public void registerHeatingSystem(String ip) {
         CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system");

@@ -18,7 +18,7 @@ public class ChlorineDispenser {
 
     public static final List<CoapClient> chlorineDispenserEndpoints = new ArrayList<>();
     public static boolean lastStatus;
-    private Logger logger;
+    private Logger logger = Logger.getInstance();
 
     public void registerChlorineDispenser(String ip) {
         CoapClient chlorineDispenserEndpoint = new CoapClient("coap://[" + ip + "]/chlorine_dispenser");

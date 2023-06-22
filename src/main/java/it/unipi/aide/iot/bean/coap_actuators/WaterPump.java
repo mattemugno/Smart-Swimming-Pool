@@ -19,7 +19,7 @@ public class WaterPump {
     public static boolean lastStatus;
     private static String status = "OFF";
     private static final List<CoapClient> waterPumpEndpoints = new ArrayList<>();
-    private Logger logger;
+    private Logger logger = Logger.getInstance();
 
     public void registerWaterPump(String ip) {
         CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water-pump/switch");

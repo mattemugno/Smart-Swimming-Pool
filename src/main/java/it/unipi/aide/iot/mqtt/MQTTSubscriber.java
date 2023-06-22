@@ -85,6 +85,7 @@ public class MQTTSubscriber implements MqttCallback {
 
             else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound - TemperatureSensor.lowerBound)/2)) ||
                     ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound - TemperatureSensor.lowerBound)/2))){
+                logger.logTemperature("Heating system have done it's work, temperature come back in the range");
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }
@@ -107,18 +108,18 @@ public class MQTTSubscriber implements MqttCallback {
             }
 
             if (sampleUnderWaterTh == 3){
-                System.out.println("Switch on water pump in INC mode");
                 WaterPump.switchWaterPump("INC");
                 mqttClient.publish(water_lev_command, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
+                logger.logWaterLevel("Water level too high: " + currentWaterLevel + " %, WaterPump switched in DEC mode");
             }
             else if (sampleOverWaterTh == 3){
-                System.out.println("Switch on water pump in DEC mode");
                 WaterPump.switchWaterPump("DEC");
                 mqttClient.publish(water_lev_command, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
+                logger.logWaterLevel("Water level too low: " + currentWaterLevel + " %, WaterPump switched in INC mode");
             }
             else if(((Objects.equals(WaterPump.isStatus(), "INC")) & (currentWaterLevel >= (float) (WaterLevelSensor.upperBound - WaterLevelSensor.lowerBound)/2)) ||
                     ((Objects.equals(WaterPump.isStatus(), "DEC")) & (currentWaterLevel <= (float) (WaterLevelSensor.upperBound - WaterLevelSensor.lowerBound)/2))){
-                System.out.println("Switch off water pump");
+                logger.logWaterLevel("Water level come back in the range");
                 WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(water_lev_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }
@@ -136,15 +137,13 @@ public class MQTTSubscriber implements MqttCallback {
                 sampleOutChlorineRange = 0;
 
             if (sampleOutChlorineRange == 3){
-                System.out.println("Switch ON chlorine dispenser");
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
-                logger.logTemperature("Average level of chlorine too low: " + currentChlorineLevel + "%, increase it");
+                logger.logChlorine("Average level of chlorine too low: " + currentChlorineLevel + "%, increase it");
 
             }
 
             else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= ChlorineSensor.upperBound - 1){
-                System.out.println("Switch OFF Chlorine dispenser");
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logChlorine("Switched OFF");

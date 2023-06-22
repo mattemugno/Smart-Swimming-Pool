@@ -4,11 +4,11 @@ import java.sql.Timestamp;
 
 public class ChlorineSample {
     private int nodeId;
-    private int chlorineLevel;
+    private int chlorine;
 
-    public ChlorineSample(int nodeId, int chlorineLevel) {
+    public ChlorineSample(int nodeId, int chlorine) {
         this.nodeId = nodeId;
-        this.chlorineLevel = chlorineLevel;
+        this.chlorine = chlorine;
     }
 
     public int getNodeId() {
@@ -19,19 +19,19 @@ public class ChlorineSample {
         this.nodeId = nodeId;
     }
 
-    public int getChlorineLevel() {
-        return chlorineLevel;
+    public int getChlorine() {
+        return chlorine;
     }
 
-    public void setChlorineLevel(int chlorineLevel) {
-        this.chlorineLevel = chlorineLevel;
+    public void setChlorine(int chlorine) {
+        this.chlorine = chlorine;
     }
 
     @Override
     public String toString() {
         return "ChlorineSample{" +
                 "nodeId=" + nodeId +
-                ", chlorineLevel=" + chlorineLevel +
+                ", chlorine=" + chlorine +
                 '}';
     }
 }

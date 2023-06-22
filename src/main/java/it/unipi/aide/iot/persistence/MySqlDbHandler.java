@@ -93,12 +93,12 @@ public class MySqlDbHandler {
     public void insertChlorineSample(ChlorineSample chlorineSample) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO Chlorine (timestamp, node, chlorine_level) VALUES (?, ?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO Chlorine (nodeId, chlorine, timestamp) VALUES (?, ?, ?)")
         )
         {
-            statement.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-            statement.setInt(2, chlorineSample.getNodeId());
-            statement.setFloat(3, chlorineSample.getChlorineLevel());
+            statement.setInt(1, chlorineSample.getNodeId());
+            statement.setInt(2, chlorineSample.getChlorine());
+            statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
         }
         catch (final SQLException e)

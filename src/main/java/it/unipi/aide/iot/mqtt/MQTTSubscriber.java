@@ -13,6 +13,7 @@ import it.unipi.aide.iot.bean.mqtt_sensors.ChlorineSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.PresenceSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.TemperatureSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
+import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,7 @@ public class MQTTSubscriber implements MqttCallback {
     private final ChlorineSensor chlorineSensor;
     private final WaterLevelSensor waterLevelSensor;
     private final TemperatureSensor temperatureSensor;
+    private Logger logger;
     Gson parser = new Gson();
 
     public MQTTSubscriber()
@@ -39,6 +41,8 @@ public class MQTTSubscriber implements MqttCallback {
         presenceSensor = new PresenceSensor();
         chlorineSensor = new ChlorineSensor();
         waterLevelSensor = new WaterLevelSensor();
+        logger = Logger.getInstance();
+
         do {
             try {
                 mqttClient = new MqttClient(BROKER, CLIENT_ID);
@@ -70,15 +74,17 @@ public class MQTTSubscriber implements MqttCallback {
             if ((currentAvgTemperature < TemperatureSensor.lowerBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))) {
                 HeatingSystem.switchHeatingSystem("INC");
                 mqttClient.publish(command_topic, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
+                logger.logTemperature("Average level of Temperature too low: " + currentAvgTemperature + "°C, increase it");
             }
 
             else if ((currentAvgTemperature > TemperatureSensor.upperBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))) {
                 HeatingSystem.switchHeatingSystem("DEC");
                 mqttClient.publish(command_topic, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
+                logger.logTemperature("Average level of Temperature too high: " + currentAvgTemperature + "°C, decrease it");
             }
 
-            else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature >= TemperatureSensor.upperBound)) ||
-                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature <= TemperatureSensor.lowerBound))){
+            else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound - TemperatureSensor.lowerBound)/2)) ||
+                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound - TemperatureSensor.lowerBound)/2))){
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }
@@ -110,8 +116,8 @@ public class MQTTSubscriber implements MqttCallback {
                 WaterPump.switchWaterPump("DEC");
                 mqttClient.publish(water_lev_command, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
             }
-            else if(((Objects.equals(WaterPump.isStatus(), "INC")) & (currentWaterLevel >= WaterLevelSensor.upperBound)) ||
-                    ((Objects.equals(WaterPump.isStatus(), "DEC")) & (currentWaterLevel <= WaterLevelSensor.lowerBound))){
+            else if(((Objects.equals(WaterPump.isStatus(), "INC")) & (currentWaterLevel >= (float) (WaterLevelSensor.upperBound - WaterLevelSensor.lowerBound)/2)) ||
+                    ((Objects.equals(WaterPump.isStatus(), "DEC")) & (currentWaterLevel <= (float) (WaterLevelSensor.upperBound - WaterLevelSensor.lowerBound)/2))){
                 System.out.println("Switch off water pump");
                 WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(water_lev_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
@@ -119,29 +125,29 @@ public class MQTTSubscriber implements MqttCallback {
 
         }
         else if(topic.equals(chlorineSensor.CHLORINE_TOPIC)){
+            String chlorine_command = "chlorine-command";
             ChlorineSample chlorineSample = parser.fromJson(payload, ChlorineSample.class);
             chlorineSensor.saveChlorineSample(chlorineSample);
             int currentChlorineLevel = ChlorineSensor.getLastChlorineLevel();
 
             if (currentChlorineLevel < ChlorineSensor.lowerBound)
                  sampleOutChlorineRange += 1;
-
-            else if (currentChlorineLevel > ChlorineSensor.upperBound)
-                sampleOutChlorineRange += 1;
-
             else
                 sampleOutChlorineRange = 0;
 
             if (sampleOutChlorineRange == 3){
-                System.out.println("Accendi dispenser");
+                System.out.println("Switch ON chlorine dispenser");
                 ChlorineDispenser.switchChlorineDispenser();
-                mqttClient.publish(chlorineSensor.CHLORINE_TOPIC, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+                mqttClient.publish(chlorine_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+                logger.logTemperature("Average level of chlorine too low: " + currentChlorineLevel + "%, increase it");
+
             }
 
-            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= ChlorineSensor.lowerBound & currentChlorineLevel <= ChlorineSensor.upperBound){
-                System.out.println("Spegni dispenser");
+            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= ChlorineSensor.upperBound - 1){
+                System.out.println("Switch OFF Chlorine dispenser");
                 ChlorineDispenser.switchChlorineDispenser();
-                mqttClient.publish(chlorineSensor.CHLORINE_TOPIC, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+                mqttClient.publish(chlorine_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+                logger.logChlorine("Switched OFF");
             }
         }
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){

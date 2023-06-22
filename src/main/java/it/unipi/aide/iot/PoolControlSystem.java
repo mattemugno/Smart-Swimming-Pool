@@ -148,12 +148,6 @@ public class PoolControlSystem {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("min", lowerBound);
-        jsonObject.put("max", upperBound);
-
-        String payload = jsonObject.toString();
-        mqttClient.publish("heating-system-command", new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         TemperatureSensor.lowerBound = lowerBound;
         TemperatureSensor.upperBound = upperBound;
     }
@@ -201,12 +195,6 @@ public class PoolControlSystem {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("min", lowerBound);
-        jsonObject.put("max", upperBound);
-
-        String payload = jsonObject.toString();
-        mqttClient.publish("chlorine-dispenser-command", new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         ChlorineSensor.lowerBound = lowerBound;
         ChlorineSensor.upperBound = upperBound;
     }
@@ -216,7 +204,7 @@ public class PoolControlSystem {
             System.out.println("Chlorine dispenser is already active");
         else {
             ChlorineDispenser.switchChlorineDispenser();
-            mqttClient.publish("chlorine-dispenser-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish("chlorine-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Chlorine dispenser started");
         }
     }
@@ -226,7 +214,7 @@ public class PoolControlSystem {
             System.out.println("Chlorine dispenser is already off");
         else {
             ChlorineDispenser.switchChlorineDispenser();
-            mqttClient.publish("chlorine-dispenser-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            mqttClient.publish("chlorine-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Chlorine dispenser switched OFF");
         }
     }
@@ -246,12 +234,6 @@ public class PoolControlSystem {
             System.out.println("ERROR: The upper bound must be larger than the lower bound\n");
             return;
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("min", lowerBound);
-        jsonObject.put("max", upperBound);
-
-        String payload = jsonObject.toString();
-        mqttClient.publish("water-level-command", new MqttMessage(payload.getBytes(StandardCharsets.UTF_8)));
         WaterLevelSensor.lowerBound = lowerBound;
         WaterLevelSensor.upperBound = upperBound;
     }

@@ -48,16 +48,10 @@ public class ChlorineDispenser {
             lastStatus = true;
         }
 
-        CoapResponse response;
         Request req = new Request(CoAP.Code.POST);
         req.getOptions().addUriQuery("mode=" + msg);
         for(CoapClient chlorineDispenserEndpoint: chlorineDispenserEndpoints) {
-            response = chlorineDispenserEndpoint.advanced(req);
-            if (response != null) {
-                System.out.println("Response: " + response.getResponseText());
-                System.out.println("Payload: " + Arrays.toString(response.getPayload()));
-            } else
-                System.out.println("Request failed");
+            chlorineDispenserEndpoint.advanced(req);
         }
     }
 }

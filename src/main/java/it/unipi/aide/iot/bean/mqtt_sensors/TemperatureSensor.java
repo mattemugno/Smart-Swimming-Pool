@@ -14,7 +14,7 @@ public class TemperatureSensor {
     public static int upperBound;
 
     public TemperatureSensor(){
-        lastTemperatureSamples = new int[10];
+        lastTemperatureSamples = new int[5];
         currentIndex = 0;
         Arrays.fill(lastTemperatureSamples, 25);
         lowerBound = 20;

@@ -25,8 +25,7 @@ public class WaterPump {
         CoapClient waterPumpEndpoint = new CoapClient("coap://[" + ip + "]/water-pump/switch");
         waterPumpEndpoints.add(waterPumpEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "water-pump");
-        //System.out.print("[REGISTRATION] The water pump: [" + ip + "] is now registered\n");
-        logger.logInfo("The water pump: [\" + ip + \"] is now registered");
+        logger.logInfo("The water pump: [" + ip + "] is now registered");
     }
 
     public void unregisterWaterPump(String ip) {

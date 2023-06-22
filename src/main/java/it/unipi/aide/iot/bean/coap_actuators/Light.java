@@ -1,5 +1,6 @@
 package it.unipi.aide.iot.bean.coap_actuators;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
+import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapResponse;
@@ -16,6 +17,7 @@ public class Light {
     private static final List<CoapClient> clientLightColorList = new ArrayList<>();
     public static boolean lastStatus;
     public static String currentColor;
+    private Logger logger = Logger.getInstance();
 
     public void registerLight(String ip) {
         CoapClient newClientLightStatus = new CoapClient("coap://[" + ip + "]/light/switch");
@@ -24,7 +26,8 @@ public class Light {
         clientLightStatusList.add(newClientLightStatus);
         clientLightColorList.add(newClientLightColor);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "light");
-        System.out.print("[REGISTRATION] The light: [" + ip + "] is now registered\n");
+        //System.out.print("[REGISTRATION] The light: [" + ip + "] is now registered\n");
+        logger.logInfo("[REGISTRATION] The light: [" + ip + "] is now registered");
     }
 
     public void unregisterLight(String ip) {
@@ -54,14 +57,14 @@ public class Light {
         if(clientLightColorList.size() == 0)
             return;
 
-        if(!Objects.equals(color, "r") & !Objects.equals(color, "g") & !Objects.equals(color, "y")) {
-            System.out.println("Color not available, try with red(r), green(g) or yellow(y)");
+        if(!Objects.equals(color, "r") & !Objects.equals(color, "g") & !Objects.equals(color, "b")) {
+            System.out.println("Color not available, try with red(r), green(g) or blue(b)");
             return;
         }
 
         switch (color) {
-            case "y":
-                currentColor = "y";
+            case "b":
+                currentColor = "b";
                 break;
             case "r":
                 currentColor = "r";

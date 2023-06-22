@@ -24,7 +24,7 @@ public class HeatingSystem {
         heatingSystemEndpoints.add(heatingSystemEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "heating_system");
         //System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered\n");
-        logger.logInfo("The heating system: [\" + ip + \"] is now registered");
+        logger.logInfo("The heating system: [" + ip + "] is now registered");
     }
 
     public void unregisterHeatingSystem(String ip) {

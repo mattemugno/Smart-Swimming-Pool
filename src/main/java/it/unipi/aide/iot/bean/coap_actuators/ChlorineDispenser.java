@@ -25,7 +25,7 @@ public class ChlorineDispenser {
         chlorineDispenserEndpoints.add(chlorineDispenserEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "chlorine_dispenser");
         //System.out.print("[REGISTRATION] The chlorine dispenser: [" + ip + "] is now registered\n");
-        logger.logInfo("The chlorine dispenser: [\" + ip + \"] is now registered");
+        logger.logInfo("The chlorine dispenser: [" + ip + "] is now registered");
 
     }
 

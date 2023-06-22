@@ -7,6 +7,8 @@ public class PresenceSensor {
     public final String PRESENCE_TOPIC = "presence";
     public static boolean currentPresence;
 
+    public PresenceSensor(){}
+
     public void savePresenceSample(PresenceSample presenceSample){
         //method to store in db the last sample read from broker
         currentPresence = presenceSample.isPresence();

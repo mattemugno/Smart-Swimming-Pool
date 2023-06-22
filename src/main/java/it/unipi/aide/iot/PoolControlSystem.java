@@ -150,6 +150,7 @@ public class PoolControlSystem {
         }
         TemperatureSensor.lowerBound = lowerBound;
         TemperatureSensor.upperBound = upperBound;
+        System.out.println("Temperature thresholds updated");
     }
 
     private static void startHeater(String[] arguments, MqttClient mqttClient) throws MqttException {
@@ -197,6 +198,7 @@ public class PoolControlSystem {
         }
         ChlorineSensor.lowerBound = lowerBound;
         ChlorineSensor.upperBound = upperBound;
+        System.out.println("Chlorine thresholds updated");
     }
 
     private static void startChlorineDispenser(MqttClient mqttClient) throws MqttException {
@@ -205,7 +207,7 @@ public class PoolControlSystem {
         else {
             ChlorineDispenser.switchChlorineDispenser();
             mqttClient.publish("chlorine-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
-            System.out.println("Chlorine dispenser started");
+            System.out.println("Chlorine dispenser switched ON");
         }
     }
 
@@ -236,6 +238,7 @@ public class PoolControlSystem {
         }
         WaterLevelSensor.lowerBound = lowerBound;
         WaterLevelSensor.upperBound = upperBound;
+        System.out.println("Water level thresholds updated");
     }
 
     private static void startWaterPump(String[] arguments, MqttClient mqttClient) throws MqttException {
@@ -273,10 +276,12 @@ public class PoolControlSystem {
             System.out.println("Missing argument/s in the request");
             return;
         }
-        if(!Objects.equals(arguments[1], "r") & !Objects.equals(arguments[1], "g") & !Objects.equals(arguments[1], "y"))
+        if(!Objects.equals(arguments[1], "r") & !Objects.equals(arguments[1], "g") & !Objects.equals(arguments[1], "b"))
             System.out.println("Color not available");
-        else
+        else {
             Light.setLightColor(arguments[1]);
+            System.out.println("Color changed to " + arguments[1]);
+        }
     }
 
     private static void getPresence() {
@@ -292,6 +297,7 @@ public class PoolControlSystem {
         else {
             Light.lightSwitch(false);
             mqttClient.publish("light-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Lights switched OFF");
         }
     }
 
@@ -301,6 +307,7 @@ public class PoolControlSystem {
         else {
             Light.lightSwitch(true);
             mqttClient.publish("light-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+            System.out.println("Lights switched ON");
         }
     }
 

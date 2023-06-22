@@ -3,15 +3,10 @@ package it.unipi.aide.iot.bean.coap_actuators;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
-import org.eclipse.californium.core.CoapHandler;
-import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP;
-import org.eclipse.californium.core.coap.MediaTypeRegistry;
-import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

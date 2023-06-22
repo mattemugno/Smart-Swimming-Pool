@@ -150,17 +150,18 @@ public class MQTTSubscriber implements MqttCallback {
             }
         }
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
-            String presence_command = "light-command";
+            String light_command = "light-command";
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
+            System.out.println(presenceSample.toString());
             presenceSensor.savePresenceSample(presenceSample);
             if((presenceSample.isPresence()) & (!Light.isLastStatus())) {
                 Light.lightSwitch(true);
-                mqttClient.publish(presence_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
+                mqttClient.publish(light_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
                 logger.logPresence("Light switched ON");
             }
             else if((!presenceSample.isPresence()) & (Light.isLastStatus())) {
                 Light.lightSwitch(false);
-                mqttClient.publish(presence_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+                mqttClient.publish(light_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logPresence("Light switched OFF");
             }
         }
@@ -180,7 +181,7 @@ public class MQTTSubscriber implements MqttCallback {
 
         int attempts = 0;
         do {
-            attempts++; // first iteration iter=1
+            attempts++;
             int MAX_RECONNECTION_ATTEMPTS = 10;
             if (attempts > MAX_RECONNECTION_ATTEMPTS)
             {

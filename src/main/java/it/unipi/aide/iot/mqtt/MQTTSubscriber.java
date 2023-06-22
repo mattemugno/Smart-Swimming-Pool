@@ -176,6 +176,7 @@ public class MQTTSubscriber implements MqttCallback {
     @Override
     public void connectionLost(Throwable throwable) {
         System.out.println("Connection with the Broker lost!");
+        System.out.println(throwable);
 
         int attempts = 0;
         do {

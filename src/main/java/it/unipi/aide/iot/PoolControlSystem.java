@@ -97,6 +97,9 @@ public class PoolControlSystem {
                         coapRegistrationServer.stop();
                         System.exit(0);
                         break;
+                    case "!help":
+                        printCommands();
+                        break;
                     default:
                         System.out.println("Command not valid, try again!\n");
                         break;
@@ -128,7 +131,8 @@ public class PoolControlSystem {
                 "14) !get_presence --> check if there is someone in the pool\n" +
                 "15) !start_light --> starts light\n" +
                 "16) !stop_light --> stops light\n" +
-                "17) !exit --> terminates the program\n"
+                "17) !help --> prints command list\n" +
+                "18) !exit --> terminates the program\n"
         );
     }
 
@@ -181,7 +185,7 @@ public class PoolControlSystem {
     }
 
     private static void getChlorine(float lastChlorineLevel) {
-        System.out.println("Current chlorine level is: " + lastChlorineLevel);
+        System.out.println("Current chlorine level is: " + lastChlorineLevel + " %");
     }
 
     private static void setChlorine(String[] arguments, MqttClient mqttClient) throws MqttException {
@@ -225,7 +229,7 @@ public class PoolControlSystem {
     }
 
     private static void getWaterLevel(int currentWaterLevel) {
-        System.out.println("Current water level is: " + currentWaterLevel);
+        System.out.println("Current water level is: " + currentWaterLevel + " %");
     }
 
     private static void setWaterLevel(String[] arguments, MqttClient mqttClient) throws MqttException {

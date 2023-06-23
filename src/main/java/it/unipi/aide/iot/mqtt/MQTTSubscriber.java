@@ -14,6 +14,7 @@ import it.unipi.aide.iot.bean.mqtt_sensors.PresenceSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.TemperatureSensor;
 import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
 import it.unipi.aide.iot.utility.Logger;
+import it.unipi.aide.iot.utility.SimulationParameters;
 import org.eclipse.paho.client.mqttv3.*;
 
 import java.nio.charset.StandardCharsets;
@@ -152,14 +153,13 @@ public class MQTTSubscriber implements MqttCallback {
         else if (topic.equals(presenceSensor.PRESENCE_TOPIC)){
             String light_command = "light-command";
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
-            System.out.println(presenceSample.toString());
             presenceSensor.savePresenceSample(presenceSample);
-            if((presenceSample.isPresence()) & (!Light.isLastStatus())) {
+            if((presenceSample.isPresence()) & (!Light.isLastStatus()) & (!SimulationParameters.isManualCommand())) {
                 Light.lightSwitch(true);
                 mqttClient.publish(light_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
                 logger.logPresence("Light switched ON");
             }
-            else if((!presenceSample.isPresence()) & (Light.isLastStatus())) {
+            else if((!presenceSample.isPresence()) & (Light.isLastStatus()) & (!SimulationParameters.isManualCommand())) {
                 Light.lightSwitch(false);
                 mqttClient.publish(light_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logPresence("Light switched OFF");

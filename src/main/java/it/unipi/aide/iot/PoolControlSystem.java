@@ -11,6 +11,7 @@ import it.unipi.aide.iot.bean.mqtt_sensors.WaterLevelSensor;
 import it.unipi.aide.iot.coap.CoapRegistrationServer;
 import it.unipi.aide.iot.mqtt.MQTTSubscriber;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
+import it.unipi.aide.iot.utility.SimulationParameters;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -296,6 +297,7 @@ public class PoolControlSystem {
             Light.lightSwitch(false);
             mqttClient.publish("light-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Lights switched OFF");
+            SimulationParameters.setManualCommand(true);
         }
     }
 
@@ -306,6 +308,7 @@ public class PoolControlSystem {
             Light.lightSwitch(true);
             mqttClient.publish("light-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Lights switched ON");
+            SimulationParameters.setManualCommand(false);
         }
     }
 

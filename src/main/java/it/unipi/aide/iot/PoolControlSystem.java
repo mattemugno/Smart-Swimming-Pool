@@ -62,10 +62,10 @@ public class PoolControlSystem {
                         setChlorine(arguments, mqttClient);
                         break;
                     case "!start_chlorine":
-                        startChlorineDispenser(mqttClient);
+                        startChlorineDispenser(arguments, mqttClient);
                         break;
                     case "!stop_chlorine":
-                        stopChlorineDispenser(mqttClient);
+                        stopChlorineDispenser(arguments, mqttClient);
                         break;
                     case "!get_water_level":
                         getWaterLevel(WaterLevelSensor.getCurrentWaterLevel());
@@ -200,7 +200,9 @@ public class PoolControlSystem {
         System.out.println("Chlorine thresholds updated");
     }
 
-    private static void startChlorineDispenser(MqttClient mqttClient) throws MqttException {
+    private static void startChlorineDispenser(String[] arguments, MqttClient mqttClient) throws MqttException {
+        if (arguments.length != 1)
+            System.out.println("Arguments are not necessary");
         if(ChlorineDispenser.lastStatus)
             System.out.println("Chlorine dispenser is already active");
         else {
@@ -210,7 +212,9 @@ public class PoolControlSystem {
         }
     }
 
-    private static void stopChlorineDispenser(MqttClient mqttClient) throws MqttException {
+    private static void stopChlorineDispenser(String[] arguments, MqttClient mqttClient) throws MqttException {
+        if (arguments.length != 1)
+            System.out.println("Arguments are not necessary");
         if(!ChlorineDispenser.lastStatus)
             System.out.println("Chlorine dispenser is already off");
         else {

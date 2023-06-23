@@ -291,24 +291,28 @@ public class PoolControlSystem {
     }
 
     private static void stopLight(MqttClient mqttClient) throws MqttException {
-        if(!Light.lastStatus)
+        if(!Light.lastStatus) {
             System.out.println("Light is already off");
+            SimulationParameters.setManualCommandLight(false);
+        }
         else {
             Light.lightSwitch(false);
             mqttClient.publish("light-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Lights switched OFF");
-            SimulationParameters.setManualCommand(false);
+            SimulationParameters.setManualCommandLight(false);
         }
     }
 
     private static void startLight(MqttClient mqttClient) throws MqttException {
-        if(Light.lastStatus)
+        if(Light.lastStatus) {
             System.out.println("Light is already on");
+            SimulationParameters.setManualCommandLight(true);
+        }
         else {
             Light.lightSwitch(true);
             mqttClient.publish("light-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Lights switched ON");
-            SimulationParameters.setManualCommand(true);
+            SimulationParameters.setManualCommandLight(true);
         }
     }
 

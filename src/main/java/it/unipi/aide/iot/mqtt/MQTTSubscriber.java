@@ -85,7 +85,7 @@ public class MQTTSubscriber implements MqttCallback {
             }
 
             else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2)) ||
-                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2))){
+                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature <= (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2))){
                 logger.logTemperature("Heating system have done it's work, temperature come back in the range");
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
@@ -154,12 +154,12 @@ public class MQTTSubscriber implements MqttCallback {
             String light_command = "light-command";
             PresenceSample presenceSample = parser.fromJson(payload, PresenceSample.class);
             presenceSensor.savePresenceSample(presenceSample);
-            if((presenceSample.isPresence()) & (!Light.isLastStatus()) & (!SimulationParameters.isManualCommand())) {
+            if((presenceSample.isPresence()) & (!Light.isLastStatus()) & (!SimulationParameters.isManualCommandLight())) {
                 Light.lightSwitch(true);
                 mqttClient.publish(light_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
                 logger.logPresence("Light switched ON");
             }
-            else if((!presenceSample.isPresence()) & (Light.isLastStatus()) & (!SimulationParameters.isManualCommand())) {
+            else if((!presenceSample.isPresence()) & (Light.isLastStatus()) & (!SimulationParameters.isManualCommandLight())) {
                 Light.lightSwitch(false);
                 mqttClient.publish(light_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logPresence("Light switched OFF");

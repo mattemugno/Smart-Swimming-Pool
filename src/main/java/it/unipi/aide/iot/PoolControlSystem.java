@@ -297,7 +297,7 @@ public class PoolControlSystem {
             Light.lightSwitch(false);
             mqttClient.publish("light-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Lights switched OFF");
-            SimulationParameters.setManualCommand(true);
+            SimulationParameters.setManualCommand(false);
         }
     }
 
@@ -308,7 +308,7 @@ public class PoolControlSystem {
             Light.lightSwitch(true);
             mqttClient.publish("light-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Lights switched ON");
-            SimulationParameters.setManualCommand(false);
+            SimulationParameters.setManualCommand(true);
         }
     }
 

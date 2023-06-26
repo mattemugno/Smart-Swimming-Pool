@@ -48,10 +48,21 @@ public class HeatingSystem {
         else if (Objects.equals(mode, "DEC"))
             status = "DEC";
 
-        Request req = new Request(CoAP.Code.POST);
-        req.getOptions().addUriQuery("mode=" + mode);
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
-            heatingSystemEndpoint.advanced(req);
+            heatingSystemEndpoint.post(new CoapHandler() {
+                @Override
+                public void onLoad(CoapResponse coapResponse) {
+                    if (coapResponse != null) {
+                        if (!coapResponse.isSuccess())
+                            System.out.print("[ERROR]Heating system switch: PUT request unsuccessful");
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    System.err.print("[ERROR] Heating system switch " + heatingSystemEndpoint.getURI() + "]");
+                }
+            }, mode, MediaTypeRegistry.TEXT_PLAIN);
         }
     }
 

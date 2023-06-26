@@ -3,7 +3,10 @@ package it.unipi.aide.iot.bean.coap_actuators;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapHandler;
+import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
@@ -44,10 +47,22 @@ public class WaterPump {
         else if (Objects.equals(mode, "DEC"))
             status = "DEC";
 
-        Request req = new Request(CoAP.Code.POST);
-        req.getOptions().addUriQuery("mode=" + mode);
-        for(CoapClient waterPumpEndpoint: waterPumpEndpoints)
-            waterPumpEndpoint.advanced(req);
+        for(CoapClient waterPumpEndpoint : waterPumpEndpoints) {
+            waterPumpEndpoint.post(new CoapHandler() {
+                @Override
+                public void onLoad(CoapResponse coapResponse) {
+                    if (coapResponse != null) {
+                        if (!coapResponse.isSuccess())
+                            System.out.print("[ERROR] Water pump switch: PUT request unsuccessful");
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    System.err.print("[ERROR] Water pump switch " + waterPumpEndpoint.getURI() + "]");
+                }
+            }, mode, MediaTypeRegistry.TEXT_PLAIN);
+        }
     }
 
     public static String isStatus() {

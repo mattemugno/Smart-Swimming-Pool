@@ -2,7 +2,10 @@ package it.unipi.aide.iot.bean.coap_actuators;
 import it.unipi.aide.iot.persistence.MySqlDbHandler;
 import it.unipi.aide.iot.utility.Logger;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapHandler;
+import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
 
 import java.util.ArrayList;
@@ -23,7 +26,6 @@ public class Light {
         clientLightStatusList.add(newClientLightStatus);
         clientLightColorList.add(newClientLightColor);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "light");
-        //System.out.print("[REGISTRATION] The light: [" + ip + "] is now registered\n");
         logger.logInfo("[REGISTRATION] The light: [" + ip + "] is now registered");
     }
 
@@ -71,11 +73,23 @@ public class Light {
                 break;
         }
 
-        String msg = "color=" + color;
-        Request req = new Request(CoAP.Code.POST);
-        req.getOptions().addUriQuery(msg);
-        for(CoapClient clientLightColor: clientLightColorList)
-            clientLightColor.advanced(req);
+
+        for(CoapClient clientLightColorEndpoint : clientLightColorList) {
+            clientLightColorEndpoint.post(new CoapHandler() {
+                @Override
+                public void onLoad(CoapResponse coapResponse) {
+                    if (coapResponse != null) {
+                        if (!coapResponse.isSuccess())
+                            System.out.print("[ERROR] Light color switch: PUT request unsuccessful");
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    System.err.print("[ERROR] Light color switch " + clientLightColorEndpoint.getURI() + "]");
+                }
+            }, color, MediaTypeRegistry.TEXT_PLAIN);
+        }
     }
 
     public static String currentColor(){

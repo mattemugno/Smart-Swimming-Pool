@@ -52,10 +52,21 @@ public class ChlorineDispenser {
             lastStatus = true;
         }
 
-        Request req = new Request(CoAP.Code.POST);
-        req.getOptions().addUriQuery("mode=" + msg);
-        for(CoapClient chlorineDispenserEndpoint: chlorineDispenserEndpoints) {
-            chlorineDispenserEndpoint.advanced(req);
+        for(CoapClient chlorineDispenserEndpoint : chlorineDispenserEndpoints) {
+            chlorineDispenserEndpoint.post(new CoapHandler() {
+                @Override
+                public void onLoad(CoapResponse coapResponse) {
+                    if (coapResponse != null) {
+                        if (!coapResponse.isSuccess())
+                            System.out.print("[ERROR] Chlorine dispenser switch: PUT request unsuccessful");
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    System.err.print("[ERROR] Chlorine dispenser switch " + chlorineDispenserEndpoint.getURI() + "]");
+                }
+            }, msg, MediaTypeRegistry.TEXT_PLAIN);
         }
     }
 }

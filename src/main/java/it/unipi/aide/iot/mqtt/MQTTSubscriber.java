@@ -72,13 +72,15 @@ public class MQTTSubscriber implements MqttCallback {
             temperatureSensor.saveTemperatureSample(temperatureSample);
             float currentAvgTemperature = temperatureSensor.getAvgTemperature();
 
-            if ((currentAvgTemperature < TemperatureSensor.lowerBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))) {
+            if ((currentAvgTemperature < TemperatureSensor.lowerBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))
+            & (!SimulationParameters.isManualCommandHeater())) {
                 HeatingSystem.switchHeatingSystem("INC");
                 mqttClient.publish(command_topic, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
                 logger.logTemperature("Average level of Temperature too low: " + currentAvgTemperature + "°C, increase it");
             }
 
-            else if ((currentAvgTemperature > TemperatureSensor.upperBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))) {
+            else if ((currentAvgTemperature > TemperatureSensor.upperBound) & (Objects.equals(HeatingSystem.isStatus(), "OFF"))
+                    & (!SimulationParameters.isManualCommandHeater())) {
                 HeatingSystem.switchHeatingSystem("DEC");
                 mqttClient.publish(command_topic, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
                 logger.logTemperature("Average level of Temperature too high: " + currentAvgTemperature + "°C, decrease it");
@@ -97,10 +99,12 @@ public class MQTTSubscriber implements MqttCallback {
             waterLevelSensor.saveWaterLevelSample(waterLevelSample);
             int currentWaterLevel = WaterLevelSensor.getCurrentWaterLevel();
 
-            if ((currentWaterLevel < WaterLevelSensor.lowerBound) & (Objects.equals(WaterPump.isStatus(), "OFF")))
+            if ((currentWaterLevel < WaterLevelSensor.lowerBound) & (Objects.equals(WaterPump.isStatus(), "OFF"))
+                    & (!SimulationParameters.isManualCommandWaterPump()))
                 sampleUnderWaterTh += 1;
 
-            else if ((currentWaterLevel > WaterLevelSensor.upperBound) & (Objects.equals(WaterPump.isStatus(), "OFF")))
+            else if ((currentWaterLevel > WaterLevelSensor.upperBound) & (Objects.equals(WaterPump.isStatus(), "OFF"))
+                    & (!SimulationParameters.isManualCommandWaterPump()))
                 sampleOverWaterTh += 1;
 
             else {
@@ -137,14 +141,15 @@ public class MQTTSubscriber implements MqttCallback {
             else
                 sampleOutChlorineRange = 0;
 
-            if (sampleOutChlorineRange == 3){
+            if (!ChlorineDispenser.lastStatus & (sampleOutChlorineRange == 3) & (!SimulationParameters.isManualCommandChlorineDisp())){
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
                 logger.logChlorine("Average level of chlorine too low: " + currentChlorineLevel + "%, increase it");
 
             }
 
-            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= (float)(ChlorineSensor.upperBound + ChlorineSensor.lowerBound)/2){
+            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= (float)(ChlorineSensor.upperBound + ChlorineSensor.lowerBound)/2
+                    & (!SimulationParameters.isManualCommandChlorineDisp())){
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logChlorine("Switched OFF");

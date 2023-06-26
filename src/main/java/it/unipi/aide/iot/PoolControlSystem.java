@@ -161,8 +161,10 @@ public class PoolControlSystem {
             System.out.println("Missing argument/s in the request");
             return;
         }
-        if (!Objects.equals(HeatingSystem.isStatus(), "OFF"))
+        if (!Objects.equals(HeatingSystem.isStatus(), "OFF")) {
             System.out.println("Heating system already active");
+            SimulationParameters.setManualCommandHeater(true);
+        }
         else {
             if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
                 System.out.println("Not valid mode");
@@ -170,17 +172,21 @@ public class PoolControlSystem {
             HeatingSystem.switchHeatingSystem(arguments[1]);
             mqttClient.publish("temperature-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
             System.out.println("Heating system started in " + arguments[1] + " mode");
+            SimulationParameters.setManualCommandHeater(true);
         }
 
     }
 
     private static void stopHeater(MqttClient mqttClient) throws MqttException {
-        if(Objects.equals(HeatingSystem.isStatus(), "OFF"))
+        if(Objects.equals(HeatingSystem.isStatus(), "OFF")) {
             System.out.println("Heating system is already off");
+            SimulationParameters.setManualCommandHeater(false);
+        }
         else {
             HeatingSystem.switchHeatingSystem("OFF");
             mqttClient.publish("temperature-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Heating system switched OFF");
+            SimulationParameters.setManualCommandHeater(false);
         }
     }
 
@@ -207,24 +213,30 @@ public class PoolControlSystem {
     private static void startChlorineDispenser(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 1)
             System.out.println("Arguments are not necessary");
-        if(ChlorineDispenser.lastStatus)
+        if(ChlorineDispenser.lastStatus) {
             System.out.println("Chlorine dispenser is already active");
+            SimulationParameters.setManualCommandChlorineDisp(true);
+        }
         else {
             ChlorineDispenser.switchChlorineDispenser();
             mqttClient.publish("chlorine-command", new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Chlorine dispenser switched ON");
+            SimulationParameters.setManualCommandChlorineDisp(true);
         }
     }
 
     private static void stopChlorineDispenser(String[] arguments, MqttClient mqttClient) throws MqttException {
         if (arguments.length != 1)
             System.out.println("Arguments are not necessary");
-        if(!ChlorineDispenser.lastStatus)
+        if(!ChlorineDispenser.lastStatus) {
             System.out.println("Chlorine dispenser is already off");
+            SimulationParameters.setManualCommandChlorineDisp(false);
+        }
         else {
             ChlorineDispenser.switchChlorineDispenser();
             mqttClient.publish("chlorine-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Chlorine dispenser switched OFF");
+            SimulationParameters.setManualCommandChlorineDisp(false);
         }
     }
 
@@ -253,8 +265,10 @@ public class PoolControlSystem {
             System.out.println("Missing argument in the request");
             return;
         }
-        if(!Objects.equals(WaterPump.isStatus(), "OFF"))
+        if(!Objects.equals(WaterPump.isStatus(), "OFF")) {
             System.out.println("Water pump is already active");
+            SimulationParameters.setManualCommandWaterPump(true);
+        }
         else {
             if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
                 System.out.println("Not valid mode");
@@ -263,17 +277,21 @@ public class PoolControlSystem {
             WaterPump.switchWaterPump(arguments[1]);
             mqttClient.publish("water-level-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
             System.out.println("Water pump started in " + arguments[1] + " mode");
+            SimulationParameters.setManualCommandWaterPump(true);
 
         }
     }
 
     private static void stopWaterPump(MqttClient mqttClient) throws MqttException {
-        if(Objects.equals(WaterPump.isStatus(), "OFF"))
+        if(Objects.equals(WaterPump.isStatus(), "OFF")) {
             System.out.println("Water pump is already off");
+            SimulationParameters.setManualCommandWaterPump(false);
+        }
         else {
             WaterPump.switchWaterPump("OFF");
             mqttClient.publish("water-level-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             System.out.println("Water pump switched OFF");
+            SimulationParameters.setManualCommandWaterPump(false);
         }
 
     }

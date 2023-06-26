@@ -26,7 +26,7 @@ public class Logger {
             fileHandler.setFormatter(new Formatter() {
                 @Override
                 public String format(LogRecord logRecord) {
-                    return logRecord.getMessage() + "\n"; // only the message of the log
+                    return logRecord.getMessage() + "\n";
                 }
             });
             logger.setUseParentHandlers(false);

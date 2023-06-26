@@ -21,7 +21,7 @@ public class ChlorineDispenser {
     private Logger logger = Logger.getInstance();
 
     public void registerChlorineDispenser(String ip) {
-        CoapClient chlorineDispenserEndpoint = new CoapClient("coap://[" + ip + "]/chlorine_dispenser/switch");
+        CoapClient chlorineDispenserEndpoint = new CoapClient("coap://[" + ip + "]/chlorine-dispenser/switch");
         chlorineDispenserEndpoints.add(chlorineDispenserEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "chlorine_dispenser");
         //System.out.print("[REGISTRATION] The chlorine dispenser: [" + ip + "] is now registered\n");

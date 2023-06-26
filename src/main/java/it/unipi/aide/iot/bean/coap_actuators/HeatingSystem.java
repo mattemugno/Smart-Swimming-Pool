@@ -20,7 +20,7 @@ public class HeatingSystem {
     private Logger logger = Logger.getInstance();
 
     public void registerHeatingSystem(String ip) {
-        CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system/switch");
+        CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating-system/switch");
         heatingSystemEndpoints.add(heatingSystemEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "heating_system");
         //System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered\n");

@@ -20,7 +20,7 @@ public class HeatingSystem {
     private Logger logger = Logger.getInstance();
 
     public void registerHeatingSystem(String ip) {
-        CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating_system/switch");
+        CoapClient heatingSystemEndpoint = new CoapClient("coap://[" + ip + "]/heating-system/switch");
         heatingSystemEndpoints.add(heatingSystemEndpoint);
         MySqlDbHandler.getInstance().insertNewDevice(ip, "heating_system");
         //System.out.print("[REGISTRATION] The heating system: [" + ip + "] is now registered\n");
@@ -50,12 +50,12 @@ public class HeatingSystem {
 
         String msg = "mode=" + mode;
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
-            heatingSystemEndpoint.post(new CoapHandler() {
+            heatingSystemEndpoint.put(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {
                         if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Heating system switch: POST request unsuccessful");
+                            System.out.print("[ERROR]Heating system switch: POST request unsuccessful\n");
                     }
                 }
 

@@ -50,12 +50,12 @@ public class HeatingSystem {
 
         String msg = "mode=" + mode;
         for(CoapClient heatingSystemEndpoint: heatingSystemEndpoints) {
-            heatingSystemEndpoint.post(new CoapHandler() {
+            heatingSystemEndpoint.put(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {
                         if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Heating system switch: POST request unsuccessful");
+                            System.out.print("[ERROR]Heating system switch: PUT request unsuccessful");
                     }
                 }
 

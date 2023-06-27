@@ -136,8 +136,15 @@ public class MQTTSubscriber implements MqttCallback {
                 mqttClient.publish(water_lev_command, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
                 logger.logWaterLevel("Water level too low: " + currentWaterLevel + " %, WaterPump switched in INC mode");
             }
-            else if(((Objects.equals(WaterPump.isStatus(), "INC")) & (currentWaterLevel >= (float) (WaterLevelSensor.upperBound + WaterLevelSensor.lowerBound)/2)) ||
-                    ((Objects.equals(WaterPump.isStatus(), "DEC")) & (currentWaterLevel <= (float) (WaterLevelSensor.upperBound + WaterLevelSensor.lowerBound)/2))){
+            else if((SimulationParameters.isManualCommandWaterPump() & (Objects.equals(WaterPump.isStatus(), "INC")) & currentWaterLevel > WaterLevelSensor.upperBound) ||
+                    (SimulationParameters.isManualCommandWaterPump() & (Objects.equals(WaterPump.isStatus(), "DEC")) & currentWaterLevel < WaterLevelSensor.lowerBound)) {
+                logger.logWaterLevel("Water level come back in the range");
+                WaterPump.switchWaterPump("OFF");
+                SimulationParameters.setManualCommandWaterPump(false);
+                mqttClient.publish(water_lev_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            }
+            else if((!SimulationParameters.isManualCommandWaterPump() & (Objects.equals(WaterPump.isStatus(), "INC")) & (currentWaterLevel > (float) (WaterLevelSensor.upperBound + WaterLevelSensor.lowerBound)/2)) ||
+                    (!SimulationParameters.isManualCommandWaterPump() & (Objects.equals(WaterPump.isStatus(), "DEC")) & (currentWaterLevel < (float) (WaterLevelSensor.upperBound + WaterLevelSensor.lowerBound)/2))){
                 logger.logWaterLevel("Water level come back in the range");
                 WaterPump.switchWaterPump("OFF");
                 mqttClient.publish(water_lev_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
@@ -159,10 +166,16 @@ public class MQTTSubscriber implements MqttCallback {
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("ON".getBytes(StandardCharsets.UTF_8)));
                 logger.logChlorine("Average level of chlorine too low: " + currentChlorineLevel + "%, increase it");
-
             }
 
-            else if(ChlorineDispenser.lastStatus & currentChlorineLevel >= (float)(ChlorineSensor.upperBound + ChlorineSensor.lowerBound)/2){
+            else if(SimulationParameters.isManualCommandChlorine() & ChlorineDispenser.lastStatus & currentChlorineLevel > ChlorineSensor.upperBound){
+                ChlorineDispenser.switchChlorineDispenser();
+                mqttClient.publish(chlorine_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+                SimulationParameters.setManualCommandChlorine(false);
+                logger.logChlorine("Switched OFF");
+            }
+
+            else if(!SimulationParameters.isManualCommandChlorine() & ChlorineDispenser.lastStatus & currentChlorineLevel > (float)(ChlorineSensor.upperBound + ChlorineSensor.lowerBound)/2){
                 ChlorineDispenser.switchChlorineDispenser();
                 mqttClient.publish(chlorine_command, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
                 logger.logChlorine("Switched OFF");

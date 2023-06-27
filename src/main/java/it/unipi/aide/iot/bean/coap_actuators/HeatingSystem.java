@@ -55,7 +55,7 @@ public class HeatingSystem {
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {
                         if (!coapResponse.isSuccess())
-                            System.out.print("[ERROR]Heating system switch: PUT request unsuccessful");
+                            System.out.print("[ERROR]Heating system switch: PUT request unsuccessful\n");
                     }
                 }
 

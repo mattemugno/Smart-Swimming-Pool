@@ -98,7 +98,7 @@ public class MQTTSubscriber implements MqttCallback {
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
             }
-            else if (currentAvgTemperature < TemperatureSensor.lowerBound){
+            /*else if (currentAvgTemperature < TemperatureSensor.lowerBound){
                 HeatingSystem.switchHeatingSystem("INC");
                 mqttClient.publish(command_topic, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
                 logger.logTemperature("Average level of Temperature too low: " + currentAvgTemperature + "°C, increase it");
@@ -107,7 +107,7 @@ public class MQTTSubscriber implements MqttCallback {
                 HeatingSystem.switchHeatingSystem("DEC");
                 mqttClient.publish(command_topic, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
                 logger.logTemperature("Average level of Temperature too high: " + currentAvgTemperature + "°C, decrease it");
-            }
+            }*/
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){
             String water_lev_command = "water-level-command";

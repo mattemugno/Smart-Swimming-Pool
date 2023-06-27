@@ -42,16 +42,17 @@ public class ChlorineDispenser {
     public static void switchChlorineDispenser(){
         if(chlorineDispenserEndpoints.size() == 0)
             return;
-        String msg;
+        String mode;
         if(lastStatus) {
-            msg = "OFF";
+            mode = "OFF";
             lastStatus = false;
         }
         else {
-            msg = "ON";
+            mode = "ON";
             lastStatus = true;
         }
 
+        String msg = "mode=" + mode;
         for(CoapClient chlorineDispenserEndpoint : chlorineDispenserEndpoints) {
             chlorineDispenserEndpoint.put(new CoapHandler() {
                 @Override

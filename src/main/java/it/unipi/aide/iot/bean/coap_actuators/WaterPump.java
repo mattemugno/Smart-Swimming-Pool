@@ -47,6 +47,7 @@ public class WaterPump {
         else if (Objects.equals(mode, "DEC"))
             status = "DEC";
 
+        String msg = "mode=" + mode;
         for(CoapClient waterPumpEndpoint : waterPumpEndpoints) {
             waterPumpEndpoint.put(new CoapHandler() {
                 @Override
@@ -61,7 +62,7 @@ public class WaterPump {
                 public void onError() {
                     System.err.print("[ERROR] Water pump switch " + waterPumpEndpoint.getURI() + "]");
                 }
-            }, mode, MediaTypeRegistry.TEXT_PLAIN);
+            }, msg, MediaTypeRegistry.TEXT_PLAIN);
         }
     }
 

@@ -163,6 +163,7 @@ public class PoolControlSystem {
         }
         if (!Objects.equals(HeatingSystem.isStatus(), "OFF")) {
             System.out.println("Heating system already active");
+            SimulationParameters.setManualCommandHeating(true);
         }
         else {
             if (!Objects.equals(arguments[1], "INC") & !Objects.equals(arguments[1], "DEC")) {
@@ -170,7 +171,8 @@ public class PoolControlSystem {
             }
             HeatingSystem.switchHeatingSystem(arguments[1]);
             mqttClient.publish("temperature-command", new MqttMessage(arguments[1].getBytes(StandardCharsets.UTF_8)));
-            System.out.println("Heating system started in " + arguments[1] + " mode");
+            System.out.println("Heating system manually started in " + arguments[1] + " mode");
+            SimulationParameters.setManualCommandHeating(true);
         }
 
     }
@@ -178,11 +180,13 @@ public class PoolControlSystem {
     private static void stopHeater(MqttClient mqttClient) throws MqttException {
         if(Objects.equals(HeatingSystem.isStatus(), "OFF")) {
             System.out.println("Heating system is already off");
+            SimulationParameters.setManualCommandHeating(false);
         }
         else {
             HeatingSystem.switchHeatingSystem("OFF");
             mqttClient.publish("temperature-command", new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
-            System.out.println("Heating system switched OFF");
+            System.out.println("Heating system manually switched OFF");
+            SimulationParameters.setManualCommandHeating(false);
         }
     }
 

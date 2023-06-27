@@ -84,11 +84,29 @@ public class MQTTSubscriber implements MqttCallback {
                 logger.logTemperature("Average level of Temperature too high: " + currentAvgTemperature + "°C, decrease it");
             }
 
-            else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature >= (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2)) ||
-                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature <= (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2))){
+            else if((SimulationParameters.isManualCommandHeating() & (Objects.equals(HeatingSystem.isStatus(), "INC")) & currentAvgTemperature > TemperatureSensor.upperBound) ||
+                   (SimulationParameters.isManualCommandHeating() & (Objects.equals(HeatingSystem.isStatus(), "DEC")) & currentAvgTemperature < TemperatureSensor.lowerBound)) {
                 logger.logTemperature("Heating system have done it's work, temperature come back in the range");
                 HeatingSystem.switchHeatingSystem("OFF");
                 mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+                SimulationParameters.setManualCommandHeating(false);
+            }
+
+            else if(((Objects.equals(HeatingSystem.isStatus(), "INC")) & (currentAvgTemperature > (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2)) ||
+                    ((Objects.equals(HeatingSystem.isStatus(), "DEC")) & (currentAvgTemperature < (float)(TemperatureSensor.upperBound + TemperatureSensor.lowerBound)/2))){
+                logger.logTemperature("Heating system have done it's work, temperature come back in the range");
+                HeatingSystem.switchHeatingSystem("OFF");
+                mqttClient.publish(command_topic, new MqttMessage("OFF".getBytes(StandardCharsets.UTF_8)));
+            }
+            else if (currentAvgTemperature < TemperatureSensor.lowerBound){
+                HeatingSystem.switchHeatingSystem("INC");
+                mqttClient.publish(command_topic, new MqttMessage("INC".getBytes(StandardCharsets.UTF_8)));
+                logger.logTemperature("Average level of Temperature too low: " + currentAvgTemperature + "°C, increase it");
+            }
+            else if (currentAvgTemperature > TemperatureSensor.upperBound){
+                HeatingSystem.switchHeatingSystem("DEC");
+                mqttClient.publish(command_topic, new MqttMessage("DEC".getBytes(StandardCharsets.UTF_8)));
+                logger.logTemperature("Average level of Temperature too high: " + currentAvgTemperature + "°C, decrease it");
             }
         }
         else if(topic.equals(waterLevelSensor.WATER_LEVEL_TOPIC)){

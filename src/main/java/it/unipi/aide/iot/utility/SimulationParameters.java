@@ -2,6 +2,7 @@ package it.unipi.aide.iot.utility;
 
 public class SimulationParameters {
     private static boolean manualCommandLight = false;
+    private static boolean manualCommandHeating = false;
 
     public SimulationParameters() {
     }
@@ -12,5 +13,13 @@ public class SimulationParameters {
 
     public static void setManualCommandLight(boolean manualCommandLight) {
         SimulationParameters.manualCommandLight = manualCommandLight;
+    }
+
+    public static boolean isManualCommandHeating() {
+        return manualCommandHeating;
+    }
+
+    public static void setManualCommandHeating(boolean manualCommandHeating) {
+        SimulationParameters.manualCommandHeating = manualCommandHeating;
     }
 }

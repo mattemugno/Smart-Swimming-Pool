@@ -6,6 +6,7 @@
 #include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
 #include "os/sys/log.h"
+#include "os/dev/button-hal.h"
 
 #include <string.h>
 #include <sys/node-id.h>
@@ -56,7 +57,7 @@ static char pub_topic[BUFFER_SIZE];
 
 static struct mqtt_connection conn;
 
-#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND >> 1)
+#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND)
 static struct etimer periodic_timer;
 
 mqtt_status_t status;
@@ -69,11 +70,10 @@ static struct mqtt_message *msg_ptr = 0;
 
 static bool inc_temp = false;
 static bool dec_temp = false;
-static int MIN_TEMP = 20;
-static int MAX_TEMP = 30;
 static int temperature = 25; 
 static int variation = 0;
 
+button_hal_button_t *btn;
 /*---------------------------------------------------------------------------*/
 PROCESS(mqtt_client_temp, "MQTT Client - Temperature");
 
@@ -102,29 +102,6 @@ static void pub_handler(const char *topic, uint16_t topic_len, const uint8_t *ch
 		LOG_INFO("Turn OFF heating system \n");
 		inc_temp = false;
 		dec_temp = false;
-	} else {
-		LOG_INFO("Received configuration message\n");
-
-		const char* min_key = "\"min\":";
-		const char* max_key = "\"max\":";
-		const char* min_pos = strstr((const char*)chunk, min_key);
-		const char* max_pos = strstr((const char*)chunk, max_key);
-
-		if (min_pos && max_pos) {
-			min_pos += strlen(min_key);
-			max_pos += strlen(max_key);
-
-			int min_value = atoi(min_pos);
-			int max_value = atoi(max_pos);
-
-			LOG_INFO("Minimum temperature: %d, Maximum temperature: %d\n", min_value, max_value);
-
-			MIN_TEMP = min_value;
-			MAX_TEMP = max_value;
-		}
-		else {
-			LOG_ERR("Invalid configuration message format!\n");
-		}
 	}
 }
 
@@ -186,15 +163,10 @@ void adjustTemp() {
         }
     } else { 
         if (rand() % 10 < 3) {
-            variation = (rand() % 2) - 1; // a value in [-1, 1]
+            variation = (rand() % 3) - 1; // a value in [-1, 1]
             temperature += variation;
         }
     }
-
-    /*if (temperature > MAX_TEMP)
-        temperature = MAX_TEMP;
-    else if (temperature < MIN_TEMP)
-        temperature = MIN_TEMP;*/
 }
 
 
@@ -210,6 +182,12 @@ PROCESS_THREAD(mqtt_client_temp, ev, data)
                      linkaddr_node_addr.u8[0], linkaddr_node_addr.u8[1],
                      linkaddr_node_addr.u8[2], linkaddr_node_addr.u8[5],
                      linkaddr_node_addr.u8[6], linkaddr_node_addr.u8[7]);
+
+  btn = button_hal_get_by_index(0);
+  if(btn == NULL) {
+	LOG_ERR("Unable to find button 0... exit");
+	PROCESS_EXIT();
+  }
 
   /* Broker registration */ 
   mqtt_register(&conn, &mqtt_client_temp, client_id, mqtt_event,
@@ -269,12 +247,15 @@ PROCESS_THREAD(mqtt_client_temp, ev, data)
       }
 
       etimer_set(&periodic_timer, STATE_MACHINE_PERIODIC);
-    }
-    else if (ev == PROCESS_EVENT_EXIT) {
-      mqtt_disconnect(&conn);
-    }
-    else if (ev == PROCESS_EVENT_CONTINUE) {
-      printf("MQTT client connection failed\n");
+    } else if(ev == button_hal_press_event){
+                if(inc_temp)
+			inc_temp = false;
+	    	else inc_temp = true;
+            
+    } else if (ev == PROCESS_EVENT_EXIT) {
+      	    mqtt_disconnect(&conn);
+    } else if (ev == PROCESS_EVENT_CONTINUE) {
+            printf("MQTT client connection failed\n");
     }
   }
 

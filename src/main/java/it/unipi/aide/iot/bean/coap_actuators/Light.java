@@ -74,6 +74,7 @@ public class Light {
         }
 
 
+        String msg = "color=" + color;
         for(CoapClient clientLightColorEndpoint : clientLightColorList) {
             clientLightColorEndpoint.put(new CoapHandler() {
                 @Override
@@ -88,7 +89,7 @@ public class Light {
                 public void onError() {
                     System.err.print("[ERROR] Light color switch " + clientLightColorEndpoint.getURI() + "]");
                 }
-            }, color, MediaTypeRegistry.TEXT_PLAIN);
+            }, msg, MediaTypeRegistry.TEXT_PLAIN);
         }
     }
 

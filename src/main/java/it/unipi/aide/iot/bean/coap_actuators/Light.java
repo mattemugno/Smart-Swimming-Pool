@@ -75,7 +75,7 @@ public class Light {
 
 
         for(CoapClient clientLightColorEndpoint : clientLightColorList) {
-            clientLightColorEndpoint.post(new CoapHandler() {
+            clientLightColorEndpoint.put(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {

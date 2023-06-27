@@ -48,7 +48,7 @@ public class WaterPump {
             status = "DEC";
 
         for(CoapClient waterPumpEndpoint : waterPumpEndpoints) {
-            waterPumpEndpoint.post(new CoapHandler() {
+            waterPumpEndpoint.put(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {

@@ -53,7 +53,7 @@ public class ChlorineDispenser {
         }
 
         for(CoapClient chlorineDispenserEndpoint : chlorineDispenserEndpoints) {
-            chlorineDispenserEndpoint.post(new CoapHandler() {
+            chlorineDispenserEndpoint.put(new CoapHandler() {
                 @Override
                 public void onLoad(CoapResponse coapResponse) {
                     if (coapResponse != null) {

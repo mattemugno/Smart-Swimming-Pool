@@ -45,6 +45,7 @@ public class Light {
             return;
 
         String msg = "mode=" + (status ? "ON" : "OFF");
+        lastStatus = status;
         for(CoapClient clientLightStatusEndpoint : clientLightStatusList) {
             clientLightStatusEndpoint.put(new CoapHandler() {
                 @Override

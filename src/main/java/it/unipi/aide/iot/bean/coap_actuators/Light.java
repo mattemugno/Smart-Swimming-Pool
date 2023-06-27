@@ -45,11 +45,22 @@ public class Light {
             return;
 
         String msg = "mode=" + (status ? "ON" : "OFF");
-        lastStatus = status;
-        Request req = new Request(CoAP.Code.POST);
-        req.getOptions().addUriQuery(msg);
-        for(CoapClient clientLightEndpoint: clientLightStatusList)
-            clientLightEndpoint.advanced(req);
+        for(CoapClient clientLightStatusEndpoint : clientLightStatusList) {
+            clientLightStatusEndpoint.put(new CoapHandler() {
+                @Override
+                public void onLoad(CoapResponse coapResponse) {
+                    if (coapResponse != null) {
+                        if (!coapResponse.isSuccess())
+                            System.out.print("[ERROR] Light switch: PUT request unsuccessful");
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    System.err.print("[ERROR] Light switch " + clientLightStatusEndpoint.getURI() + "]");
+                }
+            }, msg, MediaTypeRegistry.TEXT_PLAIN);
+        }
     }
 
     public static void setLightColor(String color) {

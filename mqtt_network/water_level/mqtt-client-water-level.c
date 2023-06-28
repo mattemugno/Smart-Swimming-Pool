@@ -6,6 +6,7 @@
 #include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
 #include "os/sys/log.h"
+#include "os/dev/button-hal.h"
 
 #include <string.h>
 #include <sys/node-id.h>
@@ -56,7 +57,7 @@ static char pub_topic[BUFFER_SIZE];
 
 static struct mqtt_connection conn;
 
-#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND)
+#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND << 1)
 static struct etimer periodic_timer;
 
 mqtt_status_t status;
@@ -69,8 +70,6 @@ static struct mqtt_message *msg_ptr = 0;
 
 static bool inc_water_level = false;
 static bool dec_water_level = false;
-static int MIN_WATER_LEV = 50;
-static int MAX_WATER_LEV = 100;
 static int water_level = 70; 
 static int variation = 0;
 
@@ -102,30 +101,7 @@ static void pub_handler(const char *topic, uint16_t topic_len, const uint8_t *ch
 		LOG_INFO("Turn OFF water pump \n");
 		inc_water_level = false;
 		dec_water_level = false;
-	} else {
-		LOG_INFO("Received configuration message\n");
-
-		const char* min_key = "\"min\":";
-		const char* max_key = "\"max\":";
-		const char* min_pos = strstr((const char*)chunk, min_key);
-		const char* max_pos = strstr((const char*)chunk, max_key);
-
-		if (min_pos && max_pos) {
-			min_pos += strlen(min_key);
-			max_pos += strlen(max_key);
-
-			int min_value = atoi(min_pos);
-			int max_value = atoi(max_pos);
-
-			LOG_INFO("Minimum water level: %d, Maximum water level: %d\n", min_value, max_value);
-
-			MIN_WATER_LEV = min_value;
-			MAX_WATER_LEV = max_value;
-		}
-		else {
-			LOG_ERR("Invalid configuration message format!\n");
-		}
-	}
+	} 
 }
 
 static void mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
@@ -177,8 +153,8 @@ static void mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data
 
 void adjustWaterLevel() {
     if (inc_water_level || dec_water_level) {
-        variation = (rand() % 5) + 1; // a value in [1,3]
-        if (rand() % 10 < 8) {
+        variation = (rand() % 2) + 1; // a value in [1,2]
+        if (rand() % 10 < 3) {
             if (inc_water_level)
                 water_level += variation;
             else
@@ -190,11 +166,6 @@ void adjustWaterLevel() {
             water_level += variation;
         }
     }
-
-    /*if (water_level > MAX_WATER_LEV)
-        water_level = MAX_WATER_LEV;
-    else if (water_level < MIN_WATER_LEV)
-        water_level = MIN_WATER_LEV;*/
 }
 
 
@@ -269,12 +240,13 @@ PROCESS_THREAD(mqtt_client_water, ev, data)
       }
 
       etimer_set(&periodic_timer, STATE_MACHINE_PERIODIC);
-    }
-    else if (ev == PROCESS_EVENT_EXIT) {
-      mqtt_disconnect(&conn);
-    }
-    else if (ev == PROCESS_EVENT_CONTINUE) {
-      printf("MQTT client connection failed\n");
+    } else if(ev == button_hal_press_event){
+            inc_water_level = true;
+            
+    } else if (ev == PROCESS_EVENT_EXIT) {
+      	    mqtt_disconnect(&conn);
+    } else if (ev == PROCESS_EVENT_CONTINUE) {
+      	    printf("MQTT client connection failed\n");
     }
   }
 

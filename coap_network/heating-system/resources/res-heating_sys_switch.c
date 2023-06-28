@@ -9,34 +9,41 @@
 #define LOG_MODULE "heating-sys"
 #define LOG_LEVEL LOG_LEVEL_APP
 
-static void heating_sys_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
+static void heating_sys_put_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
 RESOURCE(res_heating_sys_switch,
          "title=\"Heating System Switch\";rt=\"Control\"",
          NULL,
-         heating_sys_post_handler,
          NULL,
+         heating_sys_put_handler,
          NULL);
 
 bool heating_sys_on = false;
 
-static void heating_sys_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset) {
+static void heating_sys_put_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset) {
 	size_t len = 0;
 	const char *text = NULL;
+	char mode[4];
+	memset(mode, 0, 3);
 	
 	int mode_success = 1;
 	
-	len = coap_get_query_variable(request, "mode", &text);
-	if(len > 0 && len < 4) {
-		if(strncmp(text, "INC", len) == 0) {
+	len = coap_get_post_variable(request, "mode", &text);
+	memcpy(mode, text, len);
+
+	if(len > 0 && len < 10) {
+		if(strncmp(mode, "INC", len) == 0) {
 			heating_sys_on = true;
+			leds_set(LEDS_GREEN);
 			LOG_INFO("Heating system INC mode \n");
-		} else if(strncmp(text, "DEC", len) == 0) {
+		} else if(strncmp(mode, "DEC", len) == 0) {
 			heating_sys_on = true;
-			LOG_INFO("Heating Systemos DEC mode \n");
-		} else if(strncmp(text, "OFF", len) == 0) {
+			leds_set(LEDS_GREEN);
+			LOG_INFO("Heating System DEC mode \n");
+		} else if(strncmp(mode, "OFF", len) == 0) {
 			heating_sys_on = false;
-			LOG_INFO("Heating Systemos OFF\n");
+			leds_set(LEDS_RED);
+			LOG_INFO("Heating System OFF\n");
 		} else {
 			mode_success = 0;
 		}

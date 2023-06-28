@@ -6,6 +6,7 @@
 #include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
 #include "os/sys/log.h"
+#include "os/dev/button-hal.h"
 
 #include <string.h>
 #include <sys/node-id.h>
@@ -56,7 +57,7 @@ static char pub_topic[BUFFER_SIZE];
 
 static struct mqtt_connection conn;
 
-#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND)
+#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND << 2)
 static struct etimer periodic_timer;
 
 mqtt_status_t status;
@@ -229,12 +230,13 @@ PROCESS_THREAD(mqtt_client_chlorine, ev, data)
       }
 
       etimer_set(&periodic_timer, STATE_MACHINE_PERIODIC);
-    }
-    else if (ev == PROCESS_EVENT_EXIT) {
-      mqtt_disconnect(&conn);
-    }
-    else if (ev == PROCESS_EVENT_CONTINUE) {
-      printf("MQTT client connection failed\n");
+    } else if(ev == button_hal_press_event){
+            on = true;
+            
+    } else if (ev == PROCESS_EVENT_EXIT) {
+      	    mqtt_disconnect(&conn);
+    } else if (ev == PROCESS_EVENT_CONTINUE) {
+      	    printf("MQTT client connection failed\n");
     }
   }
 

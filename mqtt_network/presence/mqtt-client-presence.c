@@ -6,6 +6,7 @@
 #include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
 #include "os/sys/log.h"
+#include "os/dev/button-hal.h"
 
 #include <string.h>
 #include <sys/node-id.h>
@@ -56,7 +57,7 @@ static char pub_topic[BUFFER_SIZE];
 
 static struct mqtt_connection conn;
 
-#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND)
+#define STATE_MACHINE_PERIODIC     (CLOCK_SECOND << 3)
 static struct etimer periodic_timer;
 
 mqtt_status_t status;
@@ -141,10 +142,14 @@ static void mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data
 }
 /*---------------------------------------------------------------------------*/
 
-static void set_presence(){
-    int randomValue = rand() % 2;
-    bool randomBoolean = (randomValue == 1);
-    presence = randomBoolean;
+static void set_presence(){ 
+    int randomValue;
+    bool randomBoolean;
+    if (rand() % 10 < 4) { 
+    	randomValue = rand() % 2;
+	randomBoolean = (randomValue == 1);
+        presence = randomBoolean;
+    } 
 }
 
 #define btoa(x) ((x)?"true":"false")
@@ -221,12 +226,13 @@ PROCESS_THREAD(mqtt_client_presence, ev, data)
       }
 
       etimer_set(&periodic_timer, STATE_MACHINE_PERIODIC);
-    }
-    else if (ev == PROCESS_EVENT_EXIT) {
-      mqtt_disconnect(&conn);
-    }
-    else if (ev == PROCESS_EVENT_CONTINUE) {
-      printf("MQTT client connection failed\n");
+    } else if(ev == button_hal_press_event){
+            presence = true;
+            
+    } else if (ev == PROCESS_EVENT_EXIT) {
+      	    mqtt_disconnect(&conn);
+    } else if (ev == PROCESS_EVENT_CONTINUE) {
+            printf("MQTT client connection failed\n");
     }
   }
 

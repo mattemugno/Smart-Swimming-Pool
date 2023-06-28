@@ -4,8 +4,8 @@
 
 #include "contiki.h"
 #include "coap-engine.h"
-#include "dev/leds.h"
 #include "coap-blocking-api.h"
+#include "dev/leds.h"
 
 #include "node-id.h"
 #include "net/ipv6/simple-udp.h"
@@ -35,10 +35,6 @@ static bool registered = false;
 
 static struct etimer connectivity_timer;
 static struct etimer wait_registration;
-/*
- * Resources to be activated need to be imported through the extern keyword.
- * The build system automatically compiles the resources in the corresponding sub-directory.
- */
 
 PROCESS(heating_sys_server, "Smart swimming pool Heating System Server");
 AUTOSTART_PROCESSES(&heating_sys_server);
@@ -78,10 +74,10 @@ PROCESS_THREAD(heating_sys_server, ev, data)
 {
   PROCESS_BEGIN();
 
-  LOG_INFO("Smart swimming pool Heating System server COAP Server\n");
-  
   static coap_endpoint_t server_ep;
-  static coap_message_t request[1]; // This way the packet can be treated as pointer as usual
+  static coap_message_t request[1]; 
+
+  LOG_INFO("Smart swimming pool Heating System server COAP Server\n"); 
   
   PROCESS_PAUSE();
 

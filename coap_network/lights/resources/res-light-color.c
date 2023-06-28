@@ -2,7 +2,7 @@
 #include <string.h>
 #include "contiki.h"
 #include "coap-engine.h"
-#include "dev/leds.h"
+#include "os/dev/leds.h"
 
 #include "sys/log.h"
 #define LOG_MODULE "light-color"
@@ -13,7 +13,7 @@
 static void res_light_put_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
 RESOURCE(res_light_color,
-         "title=\"Light color: ?color=r|g|y\";rt=\"Control\"",
+         "title=\"Light color\";rt=\"Control\"",
          NULL,
          NULL,
          res_light_put_handler,
@@ -35,8 +35,8 @@ res_light_put_handler(coap_message_t *request, coap_message_t *response, uint8_t
 
   if(len > 0 && len < 7) {
 
-    if(strncmp(color, "b", len) == 0) {
-      led = LEDS_BLUE;
+    if(strncmp(color, "y", len) == 0) {
+      led = LEDS_YELLOW;
     } else if(strncmp(color, "g", len) == 0) {
       led = LEDS_GREEN;
     } else if(strncmp(color, "r", len) == 0) {
@@ -48,7 +48,10 @@ res_light_put_handler(coap_message_t *request, coap_message_t *response, uint8_t
       LOG_INFO("Color %.*s\n", (int)len, color);
 
       if(light_on) {
-	leds_set(LEDS_NUM_TO_MASK(led));
+	if (led == LEDS_YELLOW){
+		leds_set(LEDS_GREEN);
+                leds_on(LEDS_RED);
+	} else leds_set(led);
       } 
     } 
   } else {

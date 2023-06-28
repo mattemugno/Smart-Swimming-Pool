@@ -2,7 +2,7 @@
 #include <string.h>
 #include "contiki.h"
 #include "coap-engine.h"
-#include "dev/leds.h"
+#include "os/dev/leds.h"
 
 /* Log configuration */
 #include "sys/log.h"
@@ -36,7 +36,10 @@ static void light_put_handler(coap_message_t *request, coap_message_t *response,
 	if(len > 0 && len < 10) {
 		if(strncmp(mode, "ON", len) == 0) {
 			light_on = true;
-			leds_set(LEDS_NUM_TO_MASK(led));
+			if (led == LEDS_YELLOW){
+				leds_set(LEDS_GREEN);
+               			leds_on(LEDS_RED);
+			} else leds_set(led);
 			LOG_INFO("Light ON\n");
 		} else if(strncmp(mode, "OFF", len) == 0) {
 			light_on = false;

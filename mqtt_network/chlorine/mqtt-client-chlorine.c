@@ -231,7 +231,8 @@ PROCESS_THREAD(mqtt_client_chlorine, ev, data)
 
       etimer_set(&periodic_timer, STATE_MACHINE_PERIODIC);
     } else if(ev == button_hal_press_event){
-            on = true;
+            if(on) on = false;
+	    else on = true;
             
     } else if (ev == PROCESS_EVENT_EXIT) {
       	    mqtt_disconnect(&conn);

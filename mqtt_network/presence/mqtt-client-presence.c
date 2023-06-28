@@ -226,9 +226,6 @@ PROCESS_THREAD(mqtt_client_presence, ev, data)
       }
 
       etimer_set(&periodic_timer, STATE_MACHINE_PERIODIC);
-    } else if(ev == button_hal_press_event){
-            presence = true;
-            
     } else if (ev == PROCESS_EVENT_EXIT) {
       	    mqtt_disconnect(&conn);
     } else if (ev == PROCESS_EVENT_CONTINUE) {

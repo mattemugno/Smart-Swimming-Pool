@@ -153,7 +153,7 @@ static void mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data
 
 void adjustWaterLevel() {
     if (inc_water_level || dec_water_level) {
-        variation = (rand() % 2) + 1; // a value in [1,2]
+        variation = (rand() % 2) + 1; 
         if (rand() % 10 < 3) {
             if (inc_water_level)
                 water_level += variation;
@@ -162,7 +162,7 @@ void adjustWaterLevel() {
         }
     } else { // water level regulator OFF
         if (rand() % 10 < 3) { 
-            variation = (rand() % 7) - 4; // a value in [-2, 2]
+            variation = (rand() % 7) - 4; 
             water_level += variation;
         }
     }

@@ -68,14 +68,14 @@ public class Light {
         if(clientLightColorList.size() == 0)
             return;
 
-        if(!Objects.equals(color, "r") & !Objects.equals(color, "g") & !Objects.equals(color, "b")) {
-            System.out.println("Color not available, try with red(r), green(g) or blue(b)");
+        if(!Objects.equals(color, "r") & !Objects.equals(color, "g") & !Objects.equals(color, "y")) {
+            System.out.println("Color not available, try with red(r), green(g) or yellow(y)");
             return;
         }
 
         switch (color) {
             case "b":
-                currentColor = "b";
+                currentColor = "y";
                 break;
             case "r":
                 currentColor = "r";

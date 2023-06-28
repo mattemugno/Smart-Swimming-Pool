@@ -127,7 +127,7 @@ public class PoolControlSystem {
                 "10) !set_water_level <lower bound> <upper bound> --> sets the limit below which the water level must stay\n" +
                 "11) !start_water_pump <mode> --> starts water pump\n" +
                 "12) !stop_water_pump --> stops water pump\n" +
-                "13) !set_color <color> --> sets the light color (GREEN, BLUE or RED)\n" +
+                "13) !set_color <color> --> sets the light color (GREEN, YELLOW or RED)\n" +
                 "14) !get_presence --> check if there is someone in the pool\n" +
                 "15) !start_light --> starts light\n" +
                 "16) !stop_light --> stops light\n" +
@@ -300,7 +300,7 @@ public class PoolControlSystem {
             System.out.println("Missing argument/s in the request");
             return;
         }
-        if(!Objects.equals(arguments[1], "r") & !Objects.equals(arguments[1], "g") & !Objects.equals(arguments[1], "b"))
+        if(!Objects.equals(arguments[1], "r") & !Objects.equals(arguments[1], "g") & !Objects.equals(arguments[1], "y"))
             System.out.println("Color not available");
         else {
             Light.setLightColor(arguments[1]);
